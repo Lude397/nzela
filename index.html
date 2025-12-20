@@ -173,12 +173,12 @@
             }catch(error){
                 hideTypingIndicator();
                 console.error('Erreur:',error);
-                addMessage('ai','Oups, une erreur s\'est produite. Réessaie ! 😊');
+                addMessage('ai','Oups, une erreur s\'est produite. Réessaie !');
             }
         }
         
         function showSummary(summary){elements.summaryBadge.textContent=state.category==='cahier_de_charge'?'Cahier de charge':'Structuration de projet';let html=`<div class="summary-title">${summary.titre||'Ton projet'}</div><div class="summary-subtitle">${summary.description||''}</div>`;if(summary.sections){summary.sections.forEach(section=>{html+=`<div class="summary-section"><div class="summary-section-title">${section.titre}</div><div class="summary-section-content">`;if(Array.isArray(section.contenu)){html+='<ul>';section.contenu.forEach(item=>{html+=`<li>${item}</li>`});html+='</ul>'}else{html+=`<p>${section.contenu}</p>`}html+=`</div></div>`})}elements.summaryDocument.innerHTML=html;switchScreen('summary')}
-        function handleSummaryEdit(){switchScreen('chat');addMessage('ai','Qu\'est-ce que tu voudrais modifier ? 😊')}
+        function handleSummaryEdit(){switchScreen('chat');addMessage('ai','Qu\'est-ce que tu voudrais modifier ?')}
         function handleSummaryWhatsApp(){const badge=state.category==='cahier_de_charge'?'CAHIER DE CHARGE':'STRUCTURATION DE PROJET';let text=`📋 *${badge}*\n\n*${state.summary.titre||'Projet'}*\n${state.summary.description||''}\n\n━━━━━━━━━━━━━━━\n\n`;if(state.summary.sections){state.summary.sections.forEach(section=>{text+=`*${section.titre}*\n`;if(Array.isArray(section.contenu)){section.contenu.forEach(item=>{text+=`• ${item}\n`})}else{text+=`${section.contenu}\n`}text+='\n'})}text+=`━━━━━━━━━━━━━━━\n_Généré par Nzela - ARK Corporat Group_`;window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`,'_blank')}
         function switchScreen(screen){state.currentScreen=screen;elements.welcomeScreen.classList.add('hidden');elements.chatScreen.classList.remove('visible');elements.summaryScreen.classList.remove('visible');if(screen==='welcome')elements.welcomeScreen.classList.remove('hidden');else if(screen==='chat'){elements.chatScreen.classList.add('visible');elements.chatInput.focus()}else if(screen==='summary')elements.summaryScreen.classList.add('visible')}
         
