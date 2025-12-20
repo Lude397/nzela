@@ -25,1097 +25,164 @@
             --user-text: #ffffff;
             --ai-bubble: #ffffff;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        /* Container principal */
-        .app {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            background: var(--bg);
-        }
-
-        /* Écran d'accueil */
-        .welcome-screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);
-        }
-
-        .welcome-screen.hidden {
-            opacity: 0;
-            transform: translateY(-20px);
-            pointer-events: none;
-            position: absolute;
-            inset: 0;
-        }
-
-        .logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 48px;
-        }
-
-        .logo-icon {
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(224, 122, 95, 0.3);
-        }
-
-        .logo-icon span {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .logo-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .logo-tagline {
-            font-size: 15px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .welcome-input-container {
-            width: 100%;
-            max-width: 380px;
-            position: relative;
-        }
-
-        .welcome-textarea {
-            width: 100%;
-            min-height: 52px;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            padding-bottom: 20px;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text);
-            resize: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 16px var(--shadow);
-        }
-
-        .welcome-textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 4px 24px rgba(224, 122, 95, 0.15);
-        }
-
-        .welcome-textarea::placeholder {
-            color: var(--text-muted);
-        }
-
-        .welcome-send {
-            position: absolute;
-            bottom: 14px;
-            right: 14px;
-            height: 20px;
-            padding: 0 10px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            border: none;
-            border-radius: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 600;
-            color: #2d2a26;
-            transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-            opacity: 0.5;
-            box-shadow: 0 4px 12px rgba(224, 122, 95, 0.3);
-        }
-
-        .welcome-send:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(224, 122, 95, 0.4);
-        }
-
-        .welcome-send.active {
-            opacity: 1;
-        }
-
-        .welcome-send svg {
-            width: 18px;
-            height: 18px;
-            stroke: white;
-            fill: none;
-            stroke-width: 2;
-        }
-
-        /* Écran de conversation */
-        .chat-screen {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            background: var(--bg);
-        }
-
-        .chat-screen.visible {
-            display: flex;
-        }
-
-        /* Header du chat */
-        .chat-header {
-            padding: 16px 20px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .chat-header .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            margin-bottom: 0;
-            box-shadow: none;
-        }
-
-        .chat-header .logo-icon span {
-            font-size: 20px;
-        }
-
-        .chat-header-info {
-            flex: 1;
-        }
-
-        .chat-header-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .chat-header-status {
-            font-size: 12px;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .chat-header-status::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--success);
-            border-radius: 50%;
-        }
-
-        /* Zone de messages */
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: var(--bg-warm);
-        }
-
-        .message {
-            max-width: 85%;
-            animation: messageIn 0.3s ease;
-        }
-
-        @keyframes messageIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.user {
-            align-self: flex-end;
-        }
-
-        .message.ai {
-            align-self: flex-start;
-        }
-
-        .message-bubble {
-            padding: 14px 18px;
-            border-radius: 20px;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .message.user .message-bubble {
-            background: var(--user-bubble);
-            color: var(--user-text);
-            border-bottom-right-radius: 6px;
-        }
-
-        .message.ai .message-bubble {
-            background: var(--ai-bubble);
-            color: var(--text);
-            border-bottom-left-radius: 6px;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        /* Réponses suggérées */
-        .suggested-responses {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .suggested-btn {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            padding: 10px 18px;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .suggested-btn:hover {
-            border-color: var(--accent);
-            background: var(--accent-soft);
-            color: var(--accent);
-        }
-
-        /* Zone d'input chat */
-        .chat-input-container {
-            padding: 16px 20px 24px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-
-        .chat-input-wrapper {
-            display: flex;
-            align-items: flex-end;
-            gap: 12px;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: 24px;
-            padding: 6px 6px 6px 18px;
-            transition: border-color 0.2s ease;
-        }
-
-        .chat-input-wrapper:focus-within {
-            border-color: var(--accent);
-        }
-
-        .chat-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text);
-            resize: none;
-            max-height: 100px;
-            padding: 10px 0;
-        }
-
-        .chat-input:focus {
-            outline: none;
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .chat-send {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            flex-shrink: 0;
-            opacity: 0.5;
-        }
-
-        .chat-send:hover {
-            transform: scale(1.05);
-        }
-
-        .chat-send.active {
-            opacity: 1;
-        }
-
-        .chat-send svg {
-            width: 20px;
-            height: 20px;
-            stroke: white;
-            fill: none;
-            stroke-width: 2;
-        }
-
-        /* Indicateur de frappe */
-        .typing-indicator {
-            display: flex;
-            gap: 5px;
-            padding: 16px 18px;
-            background: var(--ai-bubble);
-            border-radius: 20px;
-            border-bottom-left-radius: 6px;
-            align-self: flex-start;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.4;
-            }
-            30% {
-                transform: translateY(-6px);
-                opacity: 1;
-            }
-        }
-
-        /* Écran de résumé */
-        .summary-screen {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            background: var(--bg-warm);
-            animation: fadeIn 0.4s ease;
-        }
-
-        .summary-screen.visible {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .summary-header {
-            padding: 16px 20px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .summary-header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .summary-header .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            margin-bottom: 0;
-            box-shadow: none;
-        }
-
-        .summary-header .logo-icon span {
-            font-size: 20px;
-        }
-
-        .summary-badge {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--accent);
-            background: var(--accent-soft);
-            padding: 8px 14px;
-            border-radius: 20px;
-        }
-
-        .summary-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px 20px;
-        }
-
-        .summary-document {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 28px;
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-
-        .summary-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-
-        .summary-subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .summary-section {
-            margin-bottom: 24px;
-        }
-
-        .summary-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .summary-section-title {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-
-        .summary-section-content {
-            font-size: 15px;
-            line-height: 1.7;
-            color: var(--text-soft);
-        }
-
-        .summary-section-content ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .summary-section-content li {
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        .summary-section-content li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 16px;
-            width: 8px;
-            height: 8px;
-            background: var(--accent-soft);
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-        }
-
-        /* Actions du résumé */
-        .summary-actions {
-            padding: 16px 20px 32px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 12px;
-        }
-
-        .summary-btn {
-            flex: 1;
-            padding: 16px 24px;
-            border-radius: 16px;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .summary-btn.primary {
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
-        }
-
-        .summary-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-        }
-
-        .summary-btn.secondary {
-            background: var(--bg);
-            color: var(--text);
-            border: 2px solid var(--border);
-        }
-
-        .summary-btn.secondary:hover {
-            border-color: var(--accent);
-            background: var(--accent-soft);
-        }
-
-        .summary-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .welcome-textarea {
-                min-height: 120px;
-                font-size: 15px;
-            }
-
-            .chat-messages {
-                padding: 16px;
-            }
-
-            .summary-document {
-                padding: 24px 20px;
-            }
-
-            .summary-actions {
-                flex-direction: column;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-weight: 500; }
+        .app { height: 100%; display: flex; flex-direction: column; max-width: 500px; margin: 0 auto; position: relative; background: var(--bg); }
+        .welcome-screen { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px 24px; transition: opacity 0.4s ease, transform 0.4s ease; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%); }
+        .welcome-screen.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; position: absolute; inset: 0; }
+        .logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 48px; }
+        .logo-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(224, 122, 95, 0.3); }
+        .logo-icon span { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 600; color: white; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; color: var(--text); }
+        .logo-tagline { font-size: 15px; color: var(--text-muted); margin-top: 4px; }
+        .welcome-input-container { width: 100%; max-width: 380px; position: relative; }
+        .welcome-textarea { width: 100%; min-height: 52px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; padding: 20px; padding-bottom: 20px; font-family: inherit; font-size: 16px; font-weight: 500; color: var(--text); resize: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 16px var(--shadow); }
+        .welcome-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 4px 24px rgba(224, 122, 95, 0.15); }
+        .welcome-textarea::placeholder { color: var(--text-muted); }
+        .welcome-send { position: absolute; bottom: 14px; right: 14px; height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border: none; border-radius: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #2d2a26; transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease; opacity: 0.5; box-shadow: 0 4px 12px rgba(224, 122, 95, 0.3); }
+        .welcome-send:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(224, 122, 95, 0.4); }
+        .welcome-send.active { opacity: 1; }
+        .welcome-send svg { width: 18px; height: 18px; stroke: #2d2a26; fill: none; stroke-width: 2; }
+        .chat-screen { flex: 1; display: none; flex-direction: column; height: 100%; background: var(--bg); }
+        .chat-screen.visible { display: flex; }
+        .chat-header { padding: 16px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px var(--shadow); }
+        .chat-header .logo-icon { width: 40px; height: 40px; border-radius: 12px; margin-bottom: 0; box-shadow: none; }
+        .chat-header .logo-icon span { font-size: 20px; }
+        .chat-header-info { flex: 1; }
+        .chat-header-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .chat-header-status { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 4px; }
+        .chat-header-status::before { content: ''; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-warm); }
+        .message { max-width: 85%; animation: messageIn 0.3s ease; }
+        @keyframes messageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { align-self: flex-end; }
+        .message.ai { align-self: flex-start; }
+        .message-bubble { padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; }
+        .message.user .message-bubble { background: var(--user-bubble); color: var(--user-text); border-bottom-right-radius: 6px; }
+        .message.ai .message-bubble { background: var(--ai-bubble); color: var(--text); border-bottom-left-radius: 6px; box-shadow: 0 2px 8px var(--shadow); }
+        .suggested-responses { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .suggested-btn { background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; padding: 10px 18px; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease; }
+        .suggested-btn:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+        .chat-input-container { padding: 16px 20px 24px; background: var(--bg-card); border-top: 1px solid var(--border); }
+        .chat-input-wrapper { display: flex; align-items: flex-end; gap: 12px; background: var(--bg); border: 2px solid var(--border); border-radius: 24px; padding: 6px 6px 6px 18px; transition: border-color 0.2s ease; }
+        .chat-input-wrapper:focus-within { border-color: var(--accent); }
+        .chat-input { flex: 1; background: transparent; border: none; font-family: inherit; font-size: 15px; font-weight: 500; color: var(--text); resize: none; max-height: 100px; padding: 10px 0; }
+        .chat-input:focus { outline: none; }
+        .chat-input::placeholder { color: var(--text-muted); }
+        .chat-send { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, opacity 0.2s ease; flex-shrink: 0; opacity: 0.5; }
+        .chat-send:hover { transform: scale(1.05); }
+        .chat-send.active { opacity: 1; }
+        .chat-send svg { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2; }
+        .typing-indicator { display: flex; gap: 5px; padding: 16px 18px; background: var(--ai-bubble); border-radius: 20px; border-bottom-left-radius: 6px; align-self: flex-start; box-shadow: 0 2px 8px var(--shadow); }
+        .typing-indicator span { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: typing 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+        .summary-screen { flex: 1; display: none; flex-direction: column; height: 100%; background: var(--bg-warm); animation: fadeIn 0.4s ease; }
+        .summary-screen.visible { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .summary-header { padding: 16px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px var(--shadow); }
+        .summary-header-left { display: flex; align-items: center; gap: 12px; }
+        .summary-header .logo-icon { width: 40px; height: 40px; border-radius: 12px; margin-bottom: 0; box-shadow: none; }
+        .summary-header .logo-icon span { font-size: 20px; }
+        .summary-badge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); background: var(--accent-soft); padding: 8px 14px; border-radius: 20px; }
+        .summary-content { flex: 1; overflow-y: auto; padding: 24px 20px; }
+        .summary-document { background: var(--bg-card); border-radius: 24px; padding: 28px; box-shadow: 0 4px 20px var(--shadow); }
+        .summary-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .summary-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .summary-section { margin-bottom: 24px; }
+        .summary-section:last-child { margin-bottom: 0; }
+        .summary-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 12px; }
+        .summary-section-content { font-size: 15px; line-height: 1.7; color: var(--text-soft); }
+        .summary-section-content ul { list-style: none; padding: 0; }
+        .summary-section-content li { padding: 8px 0; padding-left: 24px; position: relative; }
+        .summary-section-content li::before { content: ''; position: absolute; left: 0; top: 16px; width: 8px; height: 8px; background: var(--accent-soft); border: 2px solid var(--accent); border-radius: 50%; }
+        .summary-actions { padding: 16px 20px 32px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .summary-btn { flex: 1; padding: 16px 24px; border-radius: 16px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .summary-btn.primary { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; border: none; box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3); }
+        .summary-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+        .summary-btn.secondary { background: var(--bg); color: var(--text); border: 2px solid var(--border); }
+        .summary-btn.secondary:hover { border-color: var(--accent); background: var(--accent-soft); }
+        .summary-btn svg { width: 20px; height: 20px; }
+        @media (max-width: 480px) { .welcome-textarea { font-size: 15px; } .chat-messages { padding: 16px; } .summary-document { padding: 24px 20px; } .summary-actions { flex-direction: column; } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Écran d'accueil -->
         <div class="welcome-screen" id="welcomeScreen">
             <div class="logo">
-                <div class="logo-icon">
-                    <span>N</span>
-                </div>
+                <div class="logo-icon"><span>N</span></div>
                 <div class="logo-text">Nzela</div>
                 <div class="logo-tagline">Le chemin vers la clarté</div>
             </div>
             <div class="welcome-input-container">
-                <textarea 
-                    class="welcome-textarea" 
-                    id="welcomeInput"
-                    placeholder="Quel est ta préoccupation ?"
-                    rows="1"
-                ></textarea>
-                <button class="welcome-send" id="welcomeSend">
-                    C'est parti
-                    <svg viewBox="0 0 24 24">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </button>
+                <textarea class="welcome-textarea" id="welcomeInput" placeholder="Quel est ta préoccupation ?" rows="1"></textarea>
+                <button class="welcome-send" id="welcomeSend">C'est parti <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
             </div>
         </div>
-
-        <!-- Écran de conversation -->
         <div class="chat-screen" id="chatScreen">
             <div class="chat-header">
-                <div class="logo-icon">
-                    <span>N</span>
-                </div>
+                <div class="logo-icon"><span>N</span></div>
                 <div class="chat-header-info">
                     <div class="chat-header-title">Nzela</div>
                     <div class="chat-header-status">En ligne</div>
                 </div>
             </div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages dynamiques -->
-            </div>
+            <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <textarea 
-                        class="chat-input" 
-                        id="chatInput"
-                        placeholder="Écris ta réponse..."
-                        rows="1"
-                    ></textarea>
-                    <button class="chat-send" id="chatSend">
-                        <svg viewBox="0 0 24 24">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
+                    <textarea class="chat-input" id="chatInput" placeholder="Écris ta réponse..." rows="1"></textarea>
+                    <button class="chat-send" id="chatSend"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
                 </div>
             </div>
         </div>
-
-        <!-- Écran de résumé -->
         <div class="summary-screen" id="summaryScreen">
             <div class="summary-header">
                 <div class="summary-header-left">
-                    <div class="logo-icon">
-                        <span>N</span>
-                    </div>
+                    <div class="logo-icon"><span>N</span></div>
                     <span class="summary-badge" id="summaryBadge">Cahier de charge</span>
                 </div>
             </div>
             <div class="summary-content">
-                <div class="summary-document" id="summaryDocument">
-                    <!-- Contenu dynamique -->
-                </div>
+                <div class="summary-document" id="summaryDocument"></div>
             </div>
             <div class="summary-actions">
-                <button class="summary-btn secondary" id="summaryEdit">
-                    ✏️ Modifier
-                </button>
+                <button class="summary-btn secondary" id="summaryEdit">✏️ Modifier</button>
                 <button class="summary-btn primary" id="summaryWhatsApp">
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                     Envoyer
                 </button>
             </div>
         </div>
     </div>
-
     <script>
-        // Configuration
-        const CONFIG = {
-            apiUrl: 'https://votre-backend.vercel.app/api/chat', // À remplacer
-            whatsappNumber: '242064601399'
-        };
-
-        // État de l'application
-        const state = {
-            currentScreen: 'welcome',
-            messages: [],
-            category: null,
-            collectedData: {},
-            summary: null
-        };
-
-        // Éléments DOM
-        const elements = {
-            welcomeScreen: document.getElementById('welcomeScreen'),
-            welcomeInput: document.getElementById('welcomeInput'),
-            welcomeSend: document.getElementById('welcomeSend'),
-            chatScreen: document.getElementById('chatScreen'),
-            chatMessages: document.getElementById('chatMessages'),
-            chatInput: document.getElementById('chatInput'),
-            chatSend: document.getElementById('chatSend'),
-            summaryScreen: document.getElementById('summaryScreen'),
-            summaryBadge: document.getElementById('summaryBadge'),
-            summaryDocument: document.getElementById('summaryDocument'),
-            summaryEdit: document.getElementById('summaryEdit'),
-            summaryWhatsApp: document.getElementById('summaryWhatsApp')
-        };
-
-        // Initialisation
-        function init() {
-            elements.welcomeInput.addEventListener('input', handleWelcomeInput);
-            elements.welcomeInput.addEventListener('keydown', handleWelcomeKeydown);
-            elements.welcomeSend.addEventListener('click', handleWelcomeSend);
-
-            elements.chatInput.addEventListener('input', handleChatInput);
-            elements.chatInput.addEventListener('keydown', handleChatKeydown);
-            elements.chatSend.addEventListener('click', handleChatSend);
-
-            elements.summaryEdit.addEventListener('click', handleSummaryEdit);
-            elements.summaryWhatsApp.addEventListener('click', handleSummaryWhatsApp);
-
-            elements.welcomeInput.addEventListener('input', autoResize);
-            elements.chatInput.addEventListener('input', autoResize);
-        }
-
-        function autoResize() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        }
-
-        function handleWelcomeInput() {
-            const hasValue = elements.welcomeInput.value.trim().length > 0;
-            elements.welcomeSend.classList.toggle('active', hasValue);
-        }
-
-        function handleWelcomeKeydown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleWelcomeSend();
-            }
-        }
-
-        function handleWelcomeSend() {
-            const message = elements.welcomeInput.value.trim();
-            if (!message) return;
-
-            switchScreen('chat');
-            addMessage('user', message);
-            sendToAI(message);
-        }
-
-        function handleChatInput() {
-            const hasValue = elements.chatInput.value.trim().length > 0;
-            elements.chatSend.classList.toggle('active', hasValue);
-            autoResize.call(elements.chatInput);
-        }
-
-        function handleChatKeydown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleChatSend();
-            }
-        }
-
-        function handleChatSend() {
-            const message = elements.chatInput.value.trim();
-            if (!message) return;
-
-            addMessage('user', message);
-            elements.chatInput.value = '';
-            elements.chatInput.style.height = 'auto';
-            elements.chatSend.classList.remove('active');
-
-            sendToAI(message);
-        }
-
-        function addMessage(type, content, suggestions = null) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-
-            const bubbleDiv = document.createElement('div');
-            bubbleDiv.className = 'message-bubble';
-            bubbleDiv.textContent = content;
-            messageDiv.appendChild(bubbleDiv);
-
-            if (suggestions && suggestions.length > 0) {
-                const suggestionsDiv = document.createElement('div');
-                suggestionsDiv.className = 'suggested-responses';
-                
-                suggestions.forEach(suggestion => {
-                    const btn = document.createElement('button');
-                    btn.className = 'suggested-btn';
-                    btn.textContent = suggestion;
-                    btn.addEventListener('click', () => handleSuggestionClick(suggestion));
-                    suggestionsDiv.appendChild(btn);
-                });
-
-                messageDiv.appendChild(suggestionsDiv);
-            }
-
-            elements.chatMessages.appendChild(messageDiv);
-            scrollToBottom();
-
-            state.messages.push({ type, content });
-        }
-
-        function handleSuggestionClick(suggestion) {
-            const suggestionsDiv = elements.chatMessages.querySelector('.suggested-responses');
-            if (suggestionsDiv) suggestionsDiv.remove();
-
-            addMessage('user', suggestion);
-            sendToAI(suggestion);
-        }
-
-        function showTypingIndicator() {
-            const indicator = document.createElement('div');
-            indicator.className = 'typing-indicator';
-            indicator.id = 'typingIndicator';
-            indicator.innerHTML = '<span></span><span></span><span></span>';
-            elements.chatMessages.appendChild(indicator);
-            scrollToBottom();
-        }
-
-        function hideTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
-        }
-
-        function scrollToBottom() {
-            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
-        }
-
-        async function sendToAI(message) {
-            showTypingIndicator();
-
-            try {
-                const response = await fetch(CONFIG.apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message,
-                        history: state.messages,
-                        category: state.category,
-                        collectedData: state.collectedData
-                    })
-                });
-
-                const data = await response.json();
-                hideTypingIndicator();
-
-                if (data.category) state.category = data.category;
-                if (data.collectedData) {
-                    state.collectedData = { ...state.collectedData, ...data.collectedData };
-                }
-
-                if (data.summary) {
-                    state.summary = data.summary;
-                    showSummary(data.summary);
-                } else {
-                    addMessage('ai', data.response, data.suggestions || null);
-                }
-
-            } catch (error) {
-                hideTypingIndicator();
-                console.error('Erreur:', error);
-                addMessage('ai', 'Oups, une erreur s\'est produite. Réessaie ! 😊');
-            }
-        }
-
-        function showSummary(summary) {
-            elements.summaryBadge.textContent = 
-                state.category === 'cahier_de_charge' ? 'Cahier de charge' : 'Structuration de projet';
-
-            let html = `
-                <div class="summary-title">${summary.titre || 'Ton projet'}</div>
-                <div class="summary-subtitle">${summary.description || ''}</div>
-            `;
-
-            if (summary.sections) {
-                summary.sections.forEach(section => {
-                    html += `
-                        <div class="summary-section">
-                            <div class="summary-section-title">${section.titre}</div>
-                            <div class="summary-section-content">
-                    `;
-
-                    if (Array.isArray(section.contenu)) {
-                        html += '<ul>';
-                        section.contenu.forEach(item => {
-                            html += `<li>${item}</li>`;
-                        });
-                        html += '</ul>';
-                    } else {
-                        html += `<p>${section.contenu}</p>`;
-                    }
-
-                    html += `</div></div>`;
-                });
-            }
-
-            elements.summaryDocument.innerHTML = html;
-            switchScreen('summary');
-        }
-
-        function handleSummaryEdit() {
-            switchScreen('chat');
-            addMessage('ai', 'Qu\'est-ce que tu voudrais modifier ? 😊');
-        }
-
-        function handleSummaryWhatsApp() {
-            const badge = state.category === 'cahier_de_charge' ? 'CAHIER DE CHARGE' : 'STRUCTURATION DE PROJET';
-            let text = `📋 *${badge}*\n\n`;
-            text += `*${state.summary.titre || 'Projet'}*\n`;
-            text += `${state.summary.description || ''}\n\n`;
-            text += `━━━━━━━━━━━━━━━\n\n`;
-
-            if (state.summary.sections) {
-                state.summary.sections.forEach(section => {
-                    text += `*${section.titre}*\n`;
-                    if (Array.isArray(section.contenu)) {
-                        section.contenu.forEach(item => {
-                            text += `• ${item}\n`;
-                        });
-                    } else {
-                        text += `${section.contenu}\n`;
-                    }
-                    text += '\n';
-                });
-            }
-
-            text += `━━━━━━━━━━━━━━━\n`;
-            text += `_Généré par Nzela_`;
-
-            const encodedText = encodeURIComponent(text);
-            window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodedText}`, '_blank');
-        }
-
-        function switchScreen(screen) {
-            state.currentScreen = screen;
-
-            elements.welcomeScreen.classList.add('hidden');
-            elements.chatScreen.classList.remove('visible');
-            elements.summaryScreen.classList.remove('visible');
-
-            switch (screen) {
-                case 'welcome':
-                    elements.welcomeScreen.classList.remove('hidden');
-                    break;
-                case 'chat':
-                    elements.chatScreen.classList.add('visible');
-                    elements.chatInput.focus();
-                    break;
-                case 'summary':
-                    elements.summaryScreen.classList.add('visible');
-                    break;
-            }
-        }
-
+        const CONFIG = { apiUrl: '/api/chat', whatsappNumber: '242064601399' };
+        const state = { currentScreen: 'welcome', messages: [], category: null, collectedData: {}, summary: null };
+        const elements = { welcomeScreen: document.getElementById('welcomeScreen'), welcomeInput: document.getElementById('welcomeInput'), welcomeSend: document.getElementById('welcomeSend'), chatScreen: document.getElementById('chatScreen'), chatMessages: document.getElementById('chatMessages'), chatInput: document.getElementById('chatInput'), chatSend: document.getElementById('chatSend'), summaryScreen: document.getElementById('summaryScreen'), summaryBadge: document.getElementById('summaryBadge'), summaryDocument: document.getElementById('summaryDocument'), summaryEdit: document.getElementById('summaryEdit'), summaryWhatsApp: document.getElementById('summaryWhatsApp') };
+        function init() { elements.welcomeInput.addEventListener('input', handleWelcomeInput); elements.welcomeInput.addEventListener('keydown', handleWelcomeKeydown); elements.welcomeSend.addEventListener('click', handleWelcomeSend); elements.chatInput.addEventListener('input', handleChatInput); elements.chatInput.addEventListener('keydown', handleChatKeydown); elements.chatSend.addEventListener('click', handleChatSend); elements.summaryEdit.addEventListener('click', handleSummaryEdit); elements.summaryWhatsApp.addEventListener('click', handleSummaryWhatsApp); elements.welcomeInput.addEventListener('input', autoResize); elements.chatInput.addEventListener('input', autoResize); }
+        function autoResize() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; }
+        function handleWelcomeInput() { elements.welcomeSend.classList.toggle('active', elements.welcomeInput.value.trim().length > 0); }
+        function handleWelcomeKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleWelcomeSend(); } }
+        function handleWelcomeSend() { const message = elements.welcomeInput.value.trim(); if (!message) return; switchScreen('chat'); addMessage('user', message); sendToAI(message); }
+        function handleChatInput() { elements.chatSend.classList.toggle('active', elements.chatInput.value.trim().length > 0); autoResize.call(elements.chatInput); }
+        function handleChatKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); } }
+        function handleChatSend() { const message = elements.chatInput.value.trim(); if (!message) return; addMessage('user', message); elements.chatInput.value = ''; elements.chatInput.style.height = 'auto'; elements.chatSend.classList.remove('active'); sendToAI(message); }
+        function addMessage(type, content, suggestions = null) { const messageDiv = document.createElement('div'); messageDiv.className = `message ${type}`; const bubbleDiv = document.createElement('div'); bubbleDiv.className = 'message-bubble'; bubbleDiv.textContent = content; messageDiv.appendChild(bubbleDiv); if (suggestions && suggestions.length > 0) { const suggestionsDiv = document.createElement('div'); suggestionsDiv.className = 'suggested-responses'; suggestions.forEach(s => { const btn = document.createElement('button'); btn.className = 'suggested-btn'; btn.textContent = s; btn.addEventListener('click', () => handleSuggestionClick(s)); suggestionsDiv.appendChild(btn); }); messageDiv.appendChild(suggestionsDiv); } elements.chatMessages.appendChild(messageDiv); scrollToBottom(); state.messages.push({ type, content }); }
+        function handleSuggestionClick(suggestion) { const suggestionsDiv = elements.chatMessages.querySelector('.suggested-responses'); if (suggestionsDiv) suggestionsDiv.remove(); addMessage('user', suggestion); sendToAI(suggestion); }
+        function showTypingIndicator() { const indicator = document.createElement('div'); indicator.className = 'typing-indicator'; indicator.id = 'typingIndicator'; indicator.innerHTML = '<span></span><span></span><span></span>'; elements.chatMessages.appendChild(indicator); scrollToBottom(); }
+        function hideTypingIndicator() { const indicator = document.getElementById('typingIndicator'); if (indicator) indicator.remove(); }
+        function scrollToBottom() { elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight; }
+        async function sendToAI(message) { showTypingIndicator(); try { const response = await fetch(CONFIG.apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, history: state.messages, category: state.category, collectedData: state.collectedData }) }); const data = await response.json(); hideTypingIndicator(); if (data.category) state.category = data.category; if (data.collectedData) state.collectedData = { ...state.collectedData, ...data.collectedData }; if (data.summary) { state.summary = data.summary; showSummary(data.summary); } else { addMessage('ai', data.response, data.suggestions || null); } } catch (error) { hideTypingIndicator(); console.error('Erreur:', error); addMessage('ai', 'Oups, une erreur s\'est produite. Réessaie ! 😊'); } }
+        function showSummary(summary) { elements.summaryBadge.textContent = state.category === 'cahier_de_charge' ? 'Cahier de charge' : 'Structuration de projet'; let html = `<div class="summary-title">${summary.titre || 'Ton projet'}</div><div class="summary-subtitle">${summary.description || ''}</div>`; if (summary.sections) { summary.sections.forEach(section => { html += `<div class="summary-section"><div class="summary-section-title">${section.titre}</div><div class="summary-section-content">`; if (Array.isArray(section.contenu)) { html += '<ul>'; section.contenu.forEach(item => { html += `<li>${item}</li>`; }); html += '</ul>'; } else { html += `<p>${section.contenu}</p>`; } html += `</div></div>`; }); } elements.summaryDocument.innerHTML = html; switchScreen('summary'); }
+        function handleSummaryEdit() { switchScreen('chat'); addMessage('ai', 'Qu\'est-ce que tu voudrais modifier ? 😊'); }
+        function handleSummaryWhatsApp() { const badge = state.category === 'cahier_de_charge' ? 'CAHIER DE CHARGE' : 'STRUCTURATION DE PROJET'; let text = `📋 *${badge}*\n\n*${state.summary.titre || 'Projet'}*\n${state.summary.description || ''}\n\n━━━━━━━━━━━━━━━\n\n`; if (state.summary.sections) { state.summary.sections.forEach(section => { text += `*${section.titre}*\n`; if (Array.isArray(section.contenu)) { section.contenu.forEach(item => { text += `• ${item}\n`; }); } else { text += `${section.contenu}\n`; } text += '\n'; }); } text += `━━━━━━━━━━━━━━━\n_Généré par Nzela_`; window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank'); }
+        function switchScreen(screen) { state.currentScreen = screen; elements.welcomeScreen.classList.add('hidden'); elements.chatScreen.classList.remove('visible'); elements.summaryScreen.classList.remove('visible'); if (screen === 'welcome') elements.welcomeScreen.classList.remove('hidden'); else if (screen === 'chat') { elements.chatScreen.classList.add('visible'); elements.chatInput.focus(); } else if (screen === 'summary') elements.summaryScreen.classList.add('visible'); }
         init();
-
-        // ============================================
-        // MODE DÉMO
-        // ============================================
-        function demoMode() {
-            window.sendToAI = async function(message) {
-                showTypingIndicator();
-                await new Promise(resolve => setTimeout(resolve, 1200));
-                hideTypingIndicator();
-
-                const lowerMessage = message.toLowerCase();
-                
-                // Phase 1 - Triage
-                if (state.messages.length <= 2) {
-                    if (lowerMessage.includes('application') || lowerMessage.includes('site') || lowerMessage.includes('développeur') || lowerMessage.includes('app')) {
-                        state.category = 'cahier_de_charge';
-                        addMessage('ai', 
-                            `Tu veux créer ${lowerMessage.includes('application') || lowerMessage.includes('app') ? 'une application' : 'un site'}, tu souhaites qu'on te monte un cahier de charge ?`,
-                            ['Oui, c\'est ça', 'Pas exactement']
-                        );
-                    } else {
-                        state.category = 'structuration_projet';
-                        addMessage('ai', 
-                            `Tu veux lancer ce projet, tu souhaites qu'on fasse une structuration de projet ?`,
-                            ['Oui, c\'est ça', 'Pas exactement']
-                        );
-                    }
-                    return;
-                }
-
-                // Phase 2 - Collecte
-                if (state.messages.length <= 10) {
-                    const questions = [
-                        { q: 'Super ! C\'est pour quel secteur d\'activité ?', s: ['Restaurant', 'Commerce', 'Service', 'Autre'] },
-                        { q: 'Et qui va utiliser cette solution au quotidien ?', s: ['Moi seul', 'Mon équipe', 'Mes clients'] },
-                        { q: 'Tu as une idée du budget que tu veux y mettre ?', s: ['Pas encore', 'Petit budget', 'Budget moyen'] },
-                        { q: 'Dernière question : c\'est pour quand ?', s: ['Dès que possible', 'Dans le mois', 'Pas pressé'] }
-                    ];
-                    
-                    const questionIndex = Math.floor((state.messages.length - 3) / 2);
-                    if (questionIndex < questions.length) {
-                        addMessage('ai', questions[questionIndex].q, questions[questionIndex].s);
-                    } else {
-                        // Phase 3 - Résumé
-                        const summary = {
-                            titre: 'Application de gestion',
-                            description: 'Une solution digitale adaptée à tes besoins',
-                            sections: [
-                                {
-                                    titre: 'Contexte',
-                                    contenu: ['Secteur : Restaurant', 'Utilisateurs : Équipe interne']
-                                },
-                                {
-                                    titre: 'Objectifs',
-                                    contenu: ['Digitaliser les processus', 'Améliorer l\'efficacité', 'Gagner du temps']
-                                },
-                                {
-                                    titre: 'Fonctionnalités souhaitées',
-                                    contenu: ['Gestion des commandes', 'Interface utilisateur intuitive', 'Tableau de bord']
-                                },
-                                {
-                                    titre: 'Contraintes',
-                                    contenu: 'Budget moyen, délai flexible'
-                                }
-                            ]
-                        };
-                        state.summary = summary;
-                        showSummary(summary);
-                    }
-                    return;
-                }
-            };
-        }
-
-        demoMode();
     </script>
 </body>
 </html>
