@@ -123,12 +123,12 @@
 
         .welcome-textarea {
             width: 100%;
-            min-height: 130px;
+            min-height: 52px;
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 20px;
             padding: 20px;
-            padding-bottom: 60px;
+            padding-bottom: 20px;
             font-family: inherit;
             font-size: 16px;
             font-weight: 500;
@@ -685,7 +685,7 @@
                     class="welcome-textarea" 
                     id="welcomeInput"
                     placeholder="Quel est ta préoccupation ?"
-                    rows="4"
+                    rows="1"
                 ></textarea>
                 <button class="welcome-send" id="welcomeSend">
                     C'est parti
@@ -803,6 +803,7 @@
             elements.summaryEdit.addEventListener('click', handleSummaryEdit);
             elements.summaryWhatsApp.addEventListener('click', handleSummaryWhatsApp);
 
+            elements.welcomeInput.addEventListener('input', autoResize);
             elements.chatInput.addEventListener('input', autoResize);
         }
 
