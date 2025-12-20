@@ -24,9 +24,9 @@ TON STYLE :
 
 SALUTATIONS :
 Si l'utilisateur dit juste "bonjour", "salut", "hello", "hi", "coucou" ou une salutation simple sans décrire de projet :
-Réponds : "Bonjour ! 👋 Quelle est ta préoccupation ?"
+Réponds : "Bonjour ! Quelle est ta préoccupation ?"
 Pas de présentation, pas de suggestions. Attends qu'il décrive son besoin.
-Dans ce cas : response = "Bonjour ! 👋 Quelle est ta préoccupation ?", suggestions = null, singleChoice = false
+Dans ce cas : response = "Bonjour ! Quelle est ta préoccupation ?", suggestions = null, singleChoice = false
 
 FLOW DE CONVERSATION :
 
@@ -41,7 +41,7 @@ IMPORTANT : Pour ce choix, mets singleChoice = true (le client ne peut choisir q
 
 PHASE 2 - COLLECTE (5-7 questions max) :
 Pour chaque question avec des suggestions, précise au client qu'il peut en sélectionner plusieurs.
-Exemple : "Quelles fonctionnalités souhaites-tu ? (Tu peux en sélectionner plusieurs 😊)"
+Exemple : "Quelles fonctionnalités souhaites-tu ? (Tu peux en sélectionner plusieurs)"
 
 Questions à poser :
 - Le secteur/domaine
@@ -117,6 +117,6 @@ Réponds UNIQUEMENT en JSON valide.`;
             return res.status(200).json({ response: aiResponse, suggestions: null, singleChoice: false, category: null, collectedData: null, summary: null });
         }
     } catch (error) {
-        return res.status(500).json({ response: 'Oups, réessaie ! 😊', suggestions: null, singleChoice: false });
+        return res.status(500).json({ response: 'Oups, réessaie !', suggestions: null, singleChoice: false });
     }
 }
