@@ -8,108 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #faf9f7;
-            --bg-warm: #f5f0eb;
-            --bg-card: #ffffff;
-            --text: #2d2a26;
-            --text-soft: #5c5752;
-            --text-muted: #9a948c;
-            --accent: #e07a5f;
-            --accent-light: #f4a261;
-            --accent-soft: #fef0eb;
-            --success: #81b29a;
-            --border: #e8e4df;
-            --shadow: rgba(45, 42, 38, 0.08);
-            --user-bubble: #e07a5f;
-            --user-text: #ffffff;
-            --ai-bubble: #ffffff;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-weight: 500; }
-        .app { height: 100%; display: flex; flex-direction: column; max-width: 500px; margin: 0 auto; position: relative; background: var(--bg); }
-        .welcome-screen { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px 24px; transition: opacity 0.4s ease, transform 0.4s ease; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%); }
-        .welcome-screen.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; position: absolute; inset: 0; }
-        .logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 48px; }
-        .logo-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(224, 122, 95, 0.3); }
-        .logo-icon span { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 600; color: white; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; color: var(--text); }
-        .logo-tagline { font-size: 15px; color: var(--text-muted); margin-top: 4px; }
-        .welcome-input-container { width: 100%; max-width: 380px; position: relative; }
-        .welcome-textarea { width: 100%; min-height: 52px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; padding: 20px; padding-bottom: 20px; font-family: inherit; font-size: 16px; font-weight: 500; color: var(--text); resize: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 16px var(--shadow); }
-        .welcome-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 4px 24px rgba(224, 122, 95, 0.15); }
-        .welcome-textarea::placeholder { color: var(--text-muted); }
-        .welcome-send { position: absolute; bottom: 14px; right: 14px; height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border: none; border-radius: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #2d2a26; transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease; opacity: 0.5; box-shadow: 0 4px 12px rgba(224, 122, 95, 0.3); }
-        .welcome-send:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(224, 122, 95, 0.4); }
-        .welcome-send.active { opacity: 1; }
-        .welcome-send svg { width: 18px; height: 18px; stroke: #2d2a26; fill: none; stroke-width: 2; }
-        .chat-screen { flex: 1; display: none; flex-direction: column; height: 100%; background: var(--bg); }
-        .chat-screen.visible { display: flex; }
-        .chat-header { padding: 16px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px var(--shadow); }
-        .chat-header .logo-icon { width: 40px; height: 40px; border-radius: 12px; margin-bottom: 0; box-shadow: none; }
-        .chat-header .logo-icon span { font-size: 20px; }
-        .chat-header-info { flex: 1; }
-        .chat-header-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
-        .chat-header-status { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 4px; }
-        .chat-header-status::before { content: ''; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-warm); }
-        .message { max-width: 85%; animation: messageIn 0.3s ease; }
-        @keyframes messageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message.user { align-self: flex-end; }
-        .message.ai { align-self: flex-start; }
-        .message-bubble { padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; }
-        .message.user .message-bubble { background: var(--user-bubble); color: var(--user-text); border-bottom-right-radius: 6px; }
-        .message.ai .message-bubble { background: var(--ai-bubble); color: var(--text); border-bottom-left-radius: 6px; box-shadow: 0 2px 8px var(--shadow); }
-        .suggested-responses { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .suggested-btn { background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; padding: 10px 18px; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease; }
-        .suggested-btn:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-        .chat-input-container { padding: 16px 20px 24px; background: var(--bg-card); border-top: 1px solid var(--border); }
-        .chat-input-wrapper { display: flex; align-items: flex-end; gap: 12px; background: var(--bg); border: 2px solid var(--border); border-radius: 24px; padding: 6px 6px 6px 18px; transition: border-color 0.2s ease; }
-        .chat-input-wrapper:focus-within { border-color: var(--accent); }
-        .chat-input { flex: 1; background: transparent; border: none; font-family: inherit; font-size: 15px; font-weight: 500; color: var(--text); resize: none; max-height: 100px; padding: 10px 0; }
-        .chat-input:focus { outline: none; }
-        .chat-input::placeholder { color: var(--text-muted); }
-        .chat-send { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, opacity 0.2s ease; flex-shrink: 0; opacity: 0.5; }
-        .chat-send:hover { transform: scale(1.05); }
-        .chat-send.active { opacity: 1; }
-        .chat-send svg { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2; }
-        .typing-indicator { display: flex; gap: 5px; padding: 16px 18px; background: var(--ai-bubble); border-radius: 20px; border-bottom-left-radius: 6px; align-self: flex-start; box-shadow: 0 2px 8px var(--shadow); }
-        .typing-indicator span { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: typing 1.4s infinite; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
-        .summary-screen { flex: 1; display: none; flex-direction: column; height: 100%; background: var(--bg-warm); animation: fadeIn 0.4s ease; }
-        .summary-screen.visible { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .summary-header { padding: 16px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px var(--shadow); }
-        .summary-header-left { display: flex; align-items: center; gap: 12px; }
-        .summary-header .logo-icon { width: 40px; height: 40px; border-radius: 12px; margin-bottom: 0; box-shadow: none; }
-        .summary-header .logo-icon span { font-size: 20px; }
-        .summary-badge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); background: var(--accent-soft); padding: 8px 14px; border-radius: 20px; }
-        .summary-content { flex: 1; overflow-y: auto; padding: 24px 20px; }
-        .summary-document { background: var(--bg-card); border-radius: 24px; padding: 28px; box-shadow: 0 4px 20px var(--shadow); }
-        .summary-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-        .summary-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
-        .summary-section { margin-bottom: 24px; }
-        .summary-section:last-child { margin-bottom: 0; }
-        .summary-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 12px; }
-        .summary-section-content { font-size: 15px; line-height: 1.7; color: var(--text-soft); }
-        .summary-section-content ul { list-style: none; padding: 0; }
-        .summary-section-content li { padding: 8px 0; padding-left: 24px; position: relative; }
-        .summary-section-content li::before { content: ''; position: absolute; left: 0; top: 16px; width: 8px; height: 8px; background: var(--accent-soft); border: 2px solid var(--accent); border-radius: 50%; }
-        .summary-actions { padding: 16px 20px 32px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; gap: 12px; }
-        .summary-btn { flex: 1; padding: 16px 24px; border-radius: 16px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .summary-btn.primary { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; border: none; box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3); }
-        .summary-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
-        .summary-btn.secondary { background: var(--bg); color: var(--text); border: 2px solid var(--border); }
-        .summary-btn.secondary:hover { border-color: var(--accent); background: var(--accent-soft); }
-        .summary-btn svg { width: 20px; height: 20px; }
-        @media (max-width: 480px) { .welcome-textarea { font-size: 15px; } .chat-messages { padding: 16px; } .summary-document { padding: 24px 20px; } .summary-actions { flex-direction: column; } }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        :root{--bg:#faf9f7;--bg-warm:#f5f0eb;--bg-card:#fff;--text:#2d2a26;--text-soft:#5c5752;--text-muted:#9a948c;--accent:#e07a5f;--accent-light:#f4a261;--accent-soft:#fef0eb;--success:#81b29a;--border:#e8e4df;--shadow:rgba(45,42,38,0.08);--user-bubble:#e07a5f;--user-text:#fff;--ai-bubble:#fff}*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-weight:500}.app{height:100%;display:flex;flex-direction:column;max-width:500px;margin:0 auto;position:relative;background:var(--bg)}.welcome-screen{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;transition:opacity .4s ease,transform .4s ease;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-warm) 100%)}.welcome-screen.hidden{opacity:0;transform:translateY(-20px);pointer-events:none;position:absolute;inset:0}.logo{display:flex;flex-direction:column;align-items:center;margin-bottom:48px}.logo-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 8px 24px rgba(224,122,95,0.3)}.logo-icon span{font-family:'Playfair Display',serif;font-size:36px;font-weight:600;color:#fff}.logo-text{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;color:var(--text)}.logo-tagline{font-size:15px;color:var(--text-muted);margin-top:4px}.welcome-input-container{width:100%;max-width:380px;position:relative}.welcome-textarea{width:100%;min-height:52px;background:var(--bg-card);border:2px solid var(--border);border-radius:20px;padding:20px;font-family:inherit;font-size:16px;font-weight:500;color:var(--text);resize:none;transition:border-color .3s ease,box-shadow .3s ease;box-shadow:0 4px 16px var(--shadow)}.welcome-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 4px 24px rgba(224,122,95,0.15)}.welcome-textarea::placeholder{color:var(--text-muted)}.welcome-send{position:absolute;bottom:14px;right:14px;height:38px;padding:0 16px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);border:none;border-radius:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-size:14px;font-weight:600;color:#2d2a26;transition:transform .2s ease,opacity .2s ease,box-shadow .2s ease;opacity:0.5;box-shadow:0 4px 12px rgba(224,122,95,0.3)}.welcome-send:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(224,122,95,0.4)}.welcome-send.active{opacity:1}.welcome-send svg{width:18px;height:18px;stroke:#2d2a26;fill:none;stroke-width:2}.chat-screen{flex:1;display:none;flex-direction:column;height:100%;background:var(--bg)}.chat-screen.visible{display:flex}.chat-header{padding:16px 20px;background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px var(--shadow)}.chat-header .logo-icon{width:40px;height:40px;border-radius:12px;margin-bottom:0;box-shadow:none}.chat-header .logo-icon span{font-size:20px}.chat-header-info{flex:1}.chat-header-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}.chat-header-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}.chat-header-status::before{content:'';width:6px;height:6px;background:var(--success);border-radius:50%}.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--bg-warm)}.message{max-width:85%;animation:messageIn .3s ease}@keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.message.user{align-self:flex-end}.message.ai{align-self:flex-start}.message-bubble{padding:14px 18px;border-radius:20px;font-size:15px;line-height:1.5}.message.user .message-bubble{background:var(--user-bubble);color:var(--user-text);border-bottom-right-radius:6px}.message.ai .message-bubble{background:var(--ai-bubble);color:var(--text);border-bottom-left-radius:6px;box-shadow:0 2px 8px var(--shadow)}.suggested-responses{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.suggested-btn{background:var(--bg-card);border:2px solid var(--border);border-radius:20px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s ease}.suggested-btn:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.suggested-btn.selected{border-color:var(--accent);background:var(--accent);color:#fff}.validate-btn{background:linear-gradient(135deg,var(--success) 0%,#6a9a82 100%);border:none;border-radius:20px;padding:10px 24px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s ease;margin-top:8px;display:none;box-shadow:0 4px 12px rgba(129,178,154,0.3)}.validate-btn.visible{display:block}.validate-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(129,178,154,0.4)}.chat-input-container{padding:16px 20px 24px;background:var(--bg-card);border-top:1px solid var(--border)}.chat-input-wrapper{display:flex;align-items:flex-end;gap:12px;background:var(--bg);border:2px solid var(--border);border-radius:24px;padding:6px 6px 6px 18px;transition:border-color .2s ease}.chat-input-wrapper:focus-within{border-color:var(--accent)}.chat-input{flex:1;background:transparent;border:none;font-family:inherit;font-size:15px;font-weight:500;color:var(--text);resize:none;max-height:100px;padding:10px 0}.chat-input:focus{outline:none}.chat-input::placeholder{color:var(--text-muted)}.chat-send{width:44px;height:44px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s ease,opacity .2s ease;flex-shrink:0;opacity:0.5}.chat-send:hover{transform:scale(1.05)}.chat-send.active{opacity:1}.chat-send svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2}.typing-indicator{display:flex;gap:5px;padding:16px 18px;background:var(--ai-bubble);border-radius:20px;border-bottom-left-radius:6px;align-self:flex-start;box-shadow:0 2px 8px var(--shadow)}.typing-indicator span{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:typing 1.4s infinite}.typing-indicator span:nth-child(2){animation-delay:.2s}.typing-indicator span:nth-child(3){animation-delay:.4s}@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}.summary-screen{flex:1;display:none;flex-direction:column;height:100%;background:var(--bg-warm);animation:fadeIn .4s ease}.summary-screen.visible{display:flex}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.summary-header{padding:16px 20px;background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px var(--shadow)}.summary-header-left{display:flex;align-items:center;gap:12px}.summary-header .logo-icon{width:40px;height:40px;border-radius:12px;margin-bottom:0;box-shadow:none}.summary-header .logo-icon span{font-size:20px}.summary-badge{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);background:var(--accent-soft);padding:8px 14px;border-radius:20px}.summary-content{flex:1;overflow-y:auto;padding:24px 20px}.summary-document{background:var(--bg-card);border-radius:24px;padding:28px;box-shadow:0 4px 20px var(--shadow)}.summary-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--text);margin-bottom:6px}.summary-subtitle{color:var(--text-muted);font-size:14px;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid var(--border)}.summary-section{margin-bottom:24px}.summary-section:last-child{margin-bottom:0}.summary-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px}.summary-section-content{font-size:15px;line-height:1.7;color:var(--text-soft)}.summary-section-content ul{list-style:none;padding:0}.summary-section-content li{padding:8px 0;padding-left:24px;position:relative}.summary-section-content li::before{content:'';position:absolute;left:0;top:16px;width:8px;height:8px;background:var(--accent-soft);border:2px solid var(--accent);border-radius:50%}.summary-actions{padding:16px 20px 32px;background:var(--bg-card);border-top:1px solid var(--border);display:flex;gap:12px}.summary-btn{flex:1;padding:16px 24px;border-radius:16px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:10px}.summary-btn.primary{background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);color:#fff;border:none;box-shadow:0 4px 16px rgba(37,211,102,0.3)}.summary-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,0.4)}.summary-btn.secondary{background:var(--bg);color:var(--text);border:2px solid var(--border)}.summary-btn.secondary:hover{border-color:var(--accent);background:var(--accent-soft)}.summary-btn svg{width:20px;height:20px}@media(max-width:480px){.welcome-textarea{font-size:15px}.chat-messages{padding:16px}.summary-document{padding:24px 20px}.summary-actions{flex-direction:column}}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
     </style>
 </head>
 <body>
@@ -161,27 +60,128 @@
         </div>
     </div>
     <script>
-        const CONFIG = { apiUrl: '/api/chat', whatsappNumber: '242064601399' };
-        const state = { currentScreen: 'welcome', messages: [], category: null, collectedData: {}, summary: null };
-        const elements = { welcomeScreen: document.getElementById('welcomeScreen'), welcomeInput: document.getElementById('welcomeInput'), welcomeSend: document.getElementById('welcomeSend'), chatScreen: document.getElementById('chatScreen'), chatMessages: document.getElementById('chatMessages'), chatInput: document.getElementById('chatInput'), chatSend: document.getElementById('chatSend'), summaryScreen: document.getElementById('summaryScreen'), summaryBadge: document.getElementById('summaryBadge'), summaryDocument: document.getElementById('summaryDocument'), summaryEdit: document.getElementById('summaryEdit'), summaryWhatsApp: document.getElementById('summaryWhatsApp') };
-        function init() { elements.welcomeInput.addEventListener('input', handleWelcomeInput); elements.welcomeInput.addEventListener('keydown', handleWelcomeKeydown); elements.welcomeSend.addEventListener('click', handleWelcomeSend); elements.chatInput.addEventListener('input', handleChatInput); elements.chatInput.addEventListener('keydown', handleChatKeydown); elements.chatSend.addEventListener('click', handleChatSend); elements.summaryEdit.addEventListener('click', handleSummaryEdit); elements.summaryWhatsApp.addEventListener('click', handleSummaryWhatsApp); elements.welcomeInput.addEventListener('input', autoResize); elements.chatInput.addEventListener('input', autoResize); }
-        function autoResize() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; }
-        function handleWelcomeInput() { elements.welcomeSend.classList.toggle('active', elements.welcomeInput.value.trim().length > 0); }
-        function handleWelcomeKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleWelcomeSend(); } }
-        function handleWelcomeSend() { const message = elements.welcomeInput.value.trim(); if (!message) return; switchScreen('chat'); addMessage('user', message); sendToAI(message); }
-        function handleChatInput() { elements.chatSend.classList.toggle('active', elements.chatInput.value.trim().length > 0); autoResize.call(elements.chatInput); }
-        function handleChatKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); } }
-        function handleChatSend() { const message = elements.chatInput.value.trim(); if (!message) return; addMessage('user', message); elements.chatInput.value = ''; elements.chatInput.style.height = 'auto'; elements.chatSend.classList.remove('active'); sendToAI(message); }
-        function addMessage(type, content, suggestions = null) { const messageDiv = document.createElement('div'); messageDiv.className = `message ${type}`; const bubbleDiv = document.createElement('div'); bubbleDiv.className = 'message-bubble'; bubbleDiv.textContent = content; messageDiv.appendChild(bubbleDiv); if (suggestions && suggestions.length > 0) { const suggestionsDiv = document.createElement('div'); suggestionsDiv.className = 'suggested-responses'; suggestions.forEach(s => { const btn = document.createElement('button'); btn.className = 'suggested-btn'; btn.textContent = s; btn.addEventListener('click', () => handleSuggestionClick(s)); suggestionsDiv.appendChild(btn); }); messageDiv.appendChild(suggestionsDiv); } elements.chatMessages.appendChild(messageDiv); scrollToBottom(); state.messages.push({ type, content }); }
-        function handleSuggestionClick(suggestion) { const suggestionsDiv = elements.chatMessages.querySelector('.suggested-responses'); if (suggestionsDiv) suggestionsDiv.remove(); addMessage('user', suggestion); sendToAI(suggestion); }
-        function showTypingIndicator() { const indicator = document.createElement('div'); indicator.className = 'typing-indicator'; indicator.id = 'typingIndicator'; indicator.innerHTML = '<span></span><span></span><span></span>'; elements.chatMessages.appendChild(indicator); scrollToBottom(); }
-        function hideTypingIndicator() { const indicator = document.getElementById('typingIndicator'); if (indicator) indicator.remove(); }
-        function scrollToBottom() { elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight; }
-        async function sendToAI(message) { showTypingIndicator(); try { const response = await fetch(CONFIG.apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, history: state.messages, category: state.category, collectedData: state.collectedData }) }); const data = await response.json(); hideTypingIndicator(); if (data.category) state.category = data.category; if (data.collectedData) state.collectedData = { ...state.collectedData, ...data.collectedData }; if (data.summary) { state.summary = data.summary; showSummary(data.summary); } else { addMessage('ai', data.response, data.suggestions || null); } } catch (error) { hideTypingIndicator(); console.error('Erreur:', error); addMessage('ai', 'Oups, une erreur s\'est produite. Réessaie ! 😊'); } }
-        function showSummary(summary) { elements.summaryBadge.textContent = state.category === 'cahier_de_charge' ? 'Cahier de charge' : 'Structuration de projet'; let html = `<div class="summary-title">${summary.titre || 'Ton projet'}</div><div class="summary-subtitle">${summary.description || ''}</div>`; if (summary.sections) { summary.sections.forEach(section => { html += `<div class="summary-section"><div class="summary-section-title">${section.titre}</div><div class="summary-section-content">`; if (Array.isArray(section.contenu)) { html += '<ul>'; section.contenu.forEach(item => { html += `<li>${item}</li>`; }); html += '</ul>'; } else { html += `<p>${section.contenu}</p>`; } html += `</div></div>`; }); } elements.summaryDocument.innerHTML = html; switchScreen('summary'); }
-        function handleSummaryEdit() { switchScreen('chat'); addMessage('ai', 'Qu\'est-ce que tu voudrais modifier ? 😊'); }
-        function handleSummaryWhatsApp() { const badge = state.category === 'cahier_de_charge' ? 'CAHIER DE CHARGE' : 'STRUCTURATION DE PROJET'; let text = `📋 *${badge}*\n\n*${state.summary.titre || 'Projet'}*\n${state.summary.description || ''}\n\n━━━━━━━━━━━━━━━\n\n`; if (state.summary.sections) { state.summary.sections.forEach(section => { text += `*${section.titre}*\n`; if (Array.isArray(section.contenu)) { section.contenu.forEach(item => { text += `• ${item}\n`; }); } else { text += `${section.contenu}\n`; } text += '\n'; }); } text += `━━━━━━━━━━━━━━━\n_Généré par Nzela_`; window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank'); }
-        function switchScreen(screen) { state.currentScreen = screen; elements.welcomeScreen.classList.add('hidden'); elements.chatScreen.classList.remove('visible'); elements.summaryScreen.classList.remove('visible'); if (screen === 'welcome') elements.welcomeScreen.classList.remove('hidden'); else if (screen === 'chat') { elements.chatScreen.classList.add('visible'); elements.chatInput.focus(); } else if (screen === 'summary') elements.summaryScreen.classList.add('visible'); }
+        const CONFIG={apiUrl:'/api/chat',whatsappNumber:'242064601399'};
+        const state={currentScreen:'welcome',messages:[],category:null,collectedData:{},summary:null,selectedSuggestions:[],isSingleChoice:false};
+        const elements={welcomeScreen:document.getElementById('welcomeScreen'),welcomeInput:document.getElementById('welcomeInput'),welcomeSend:document.getElementById('welcomeSend'),chatScreen:document.getElementById('chatScreen'),chatMessages:document.getElementById('chatMessages'),chatInput:document.getElementById('chatInput'),chatSend:document.getElementById('chatSend'),summaryScreen:document.getElementById('summaryScreen'),summaryBadge:document.getElementById('summaryBadge'),summaryDocument:document.getElementById('summaryDocument'),summaryEdit:document.getElementById('summaryEdit'),summaryWhatsApp:document.getElementById('summaryWhatsApp')};
+        
+        function init(){elements.welcomeInput.addEventListener('input',handleWelcomeInput);elements.welcomeInput.addEventListener('keydown',handleWelcomeKeydown);elements.welcomeSend.addEventListener('click',handleWelcomeSend);elements.chatInput.addEventListener('input',handleChatInput);elements.chatInput.addEventListener('keydown',handleChatKeydown);elements.chatSend.addEventListener('click',handleChatSend);elements.summaryEdit.addEventListener('click',handleSummaryEdit);elements.summaryWhatsApp.addEventListener('click',handleSummaryWhatsApp);elements.welcomeInput.addEventListener('input',autoResize);elements.chatInput.addEventListener('input',autoResize)}
+        
+        function autoResize(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'}
+        function handleWelcomeInput(){elements.welcomeSend.classList.toggle('active',elements.welcomeInput.value.trim().length>0)}
+        function handleWelcomeKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleWelcomeSend()}}
+        function handleWelcomeSend(){const message=elements.welcomeInput.value.trim();if(!message)return;switchScreen('chat');addMessage('user',message);sendToAI(message)}
+        function handleChatInput(){elements.chatSend.classList.toggle('active',elements.chatInput.value.trim().length>0);autoResize.call(elements.chatInput)}
+        function handleChatKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleChatSend()}}
+        function handleChatSend(){const message=elements.chatInput.value.trim();if(!message)return;addMessage('user',message);elements.chatInput.value='';elements.chatInput.style.height='auto';elements.chatSend.classList.remove('active');sendToAI(message)}
+        
+        function addMessage(type,content,suggestions=null,singleChoice=false){
+            const messageDiv=document.createElement('div');
+            messageDiv.className=`message ${type}`;
+            const bubbleDiv=document.createElement('div');
+            bubbleDiv.className='message-bubble';
+            bubbleDiv.textContent=content;
+            messageDiv.appendChild(bubbleDiv);
+            
+            if(suggestions&&suggestions.length>0){
+                state.selectedSuggestions=[];
+                state.isSingleChoice=singleChoice;
+                
+                const suggestionsDiv=document.createElement('div');
+                suggestionsDiv.className='suggested-responses';
+                suggestionsDiv.id='currentSuggestions';
+                
+                suggestions.forEach(s=>{
+                    const btn=document.createElement('button');
+                    btn.className='suggested-btn';
+                    btn.textContent=s;
+                    btn.addEventListener('click',()=>handleSuggestionClick(btn,s,singleChoice));
+                    suggestionsDiv.appendChild(btn);
+                });
+                
+                if(!singleChoice){
+                    const validateBtn=document.createElement('button');
+                    validateBtn.className='validate-btn';
+                    validateBtn.id='validateBtn';
+                    validateBtn.textContent='✓ Valider ma sélection';
+                    validateBtn.addEventListener('click',handleValidateSelection);
+                    suggestionsDiv.appendChild(validateBtn);
+                }
+                
+                messageDiv.appendChild(suggestionsDiv);
+            }
+            
+            elements.chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+            state.messages.push({type,content});
+        }
+        
+        function handleSuggestionClick(btn,suggestion,singleChoice){
+            if(singleChoice){
+                const suggestionsDiv=document.getElementById('currentSuggestions');
+                if(suggestionsDiv)suggestionsDiv.remove();
+                addMessage('user',suggestion);
+                sendToAI(suggestion);
+            }else{
+                btn.classList.toggle('selected');
+                if(btn.classList.contains('selected')){
+                    state.selectedSuggestions.push(suggestion);
+                }else{
+                    state.selectedSuggestions=state.selectedSuggestions.filter(s=>s!==suggestion);
+                }
+                const validateBtn=document.getElementById('validateBtn');
+                if(validateBtn){
+                    validateBtn.classList.toggle('visible',state.selectedSuggestions.length>0);
+                }
+            }
+        }
+        
+        function handleValidateSelection(){
+            if(state.selectedSuggestions.length===0)return;
+            const message=state.selectedSuggestions.join(', ');
+            const suggestionsDiv=document.getElementById('currentSuggestions');
+            if(suggestionsDiv)suggestionsDiv.remove();
+            addMessage('user',message);
+            sendToAI(message);
+            state.selectedSuggestions=[];
+        }
+        
+        function showTypingIndicator(){const indicator=document.createElement('div');indicator.className='typing-indicator';indicator.id='typingIndicator';indicator.innerHTML='<span></span><span></span><span></span>';elements.chatMessages.appendChild(indicator);scrollToBottom()}
+        function hideTypingIndicator(){const indicator=document.getElementById('typingIndicator');if(indicator)indicator.remove()}
+        function scrollToBottom(){elements.chatMessages.scrollTop=elements.chatMessages.scrollHeight}
+        
+        async function sendToAI(message){
+            showTypingIndicator();
+            try{
+                const response=await fetch(CONFIG.apiUrl,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({message,history:state.messages,category:state.category,collectedData:state.collectedData})
+                });
+                const data=await response.json();
+                hideTypingIndicator();
+                
+                if(data.category)state.category=data.category;
+                if(data.collectedData)state.collectedData={...state.collectedData,...data.collectedData};
+                
+                if(data.summary){
+                    state.summary=data.summary;
+                    showSummary(data.summary);
+                }else{
+                    const isSingleChoice=data.singleChoice||false;
+                    addMessage('ai',data.response,data.suggestions||null,isSingleChoice);
+                }
+            }catch(error){
+                hideTypingIndicator();
+                console.error('Erreur:',error);
+                addMessage('ai','Oups, une erreur s\'est produite. Réessaie ! 😊');
+            }
+        }
+        
+        function showSummary(summary){elements.summaryBadge.textContent=state.category==='cahier_de_charge'?'Cahier de charge':'Structuration de projet';let html=`<div class="summary-title">${summary.titre||'Ton projet'}</div><div class="summary-subtitle">${summary.description||''}</div>`;if(summary.sections){summary.sections.forEach(section=>{html+=`<div class="summary-section"><div class="summary-section-title">${section.titre}</div><div class="summary-section-content">`;if(Array.isArray(section.contenu)){html+='<ul>';section.contenu.forEach(item=>{html+=`<li>${item}</li>`});html+='</ul>'}else{html+=`<p>${section.contenu}</p>`}html+=`</div></div>`})}elements.summaryDocument.innerHTML=html;switchScreen('summary')}
+        function handleSummaryEdit(){switchScreen('chat');addMessage('ai','Qu\'est-ce que tu voudrais modifier ? 😊')}
+        function handleSummaryWhatsApp(){const badge=state.category==='cahier_de_charge'?'CAHIER DE CHARGE':'STRUCTURATION DE PROJET';let text=`📋 *${badge}*\n\n*${state.summary.titre||'Projet'}*\n${state.summary.description||''}\n\n━━━━━━━━━━━━━━━\n\n`;if(state.summary.sections){state.summary.sections.forEach(section=>{text+=`*${section.titre}*\n`;if(Array.isArray(section.contenu)){section.contenu.forEach(item=>{text+=`• ${item}\n`})}else{text+=`${section.contenu}\n`}text+='\n'})}text+=`━━━━━━━━━━━━━━━\n_Généré par Nzela - ARK Corporat Group_`;window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`,'_blank')}
+        function switchScreen(screen){state.currentScreen=screen;elements.welcomeScreen.classList.add('hidden');elements.chatScreen.classList.remove('visible');elements.summaryScreen.classList.remove('visible');if(screen==='welcome')elements.welcomeScreen.classList.remove('hidden');else if(screen==='chat'){elements.chatScreen.classList.add('visible');elements.chatInput.focus()}else if(screen==='summary')elements.summaryScreen.classList.add('visible')}
+        
         init();
     </script>
 </body>
