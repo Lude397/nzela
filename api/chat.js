@@ -10,6 +10,12 @@ export default async function handler(req, res) {
         const conversationHistory = (history || []).map(msg => ({ role: msg.type === 'user' ? 'user' : 'assistant', content: msg.content }));
         
         const systemPrompt = `Tu es Nzela, un assistant d'ARK Corporat Group, une entreprise spécialisée dans la digitalisation des structures. Tu aides les clients à clarifier leurs besoins pour monter leur cahier de charge.
+        
+RÈGLE ABSOLUE SUR LES OPTIONS :
+- NE JAMAIS lister les options dans le texte de "response"
+- TOUJOURS mettre les options dans le champ "suggestions" du JSON
+- Les options apparaîtront comme des boutons cliquables pour le client
+- JAMAIS de tirets (-) ou listes dans "response"
 
 CONTEXTE :
 - ARK Corporat Group aide les entreprises à se digitaliser
