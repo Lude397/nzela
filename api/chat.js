@@ -222,7 +222,7 @@ IMPORTANT :
                 { role: 'user', content: `Génère le ${categoryLabel} complet pour : "${preoccupation}"` }
             ], 
             temperature: 0.7, 
-            max_tokens: 2000 
+            max_tokens: 3000 
         })
     });
 
