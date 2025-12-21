@@ -36,8 +36,17 @@ const EXEMPLES = [
     "Je veux automatiser ma pharmacie",
     "Je veux créer un hôtel",
     "Je veux lancer un garage auto",
-    "Je veux digitaliser mon restaurant",
+    "Je veux digitaliser ma boutique de vêtements",
+    "Je veux gérer mon supermarché avec une app",
+    "Je veux créer un système pour ma quincaillerie",
+    "Je veux automatiser ma librairie",
+    "Je veux digitaliser ma boulangerie",
+    "Je veux créer une app pour mon bar",
     "Je veux créer une clinique",
+    "Je veux gérer ma poissonnerie",
+    "Je veux gérer mon école avec un système",
+    "Je veux automatiser ma salle de sport",
+    "Je veux automatiser mon auberge",
     "Je veux ouvrir une librairie",
     "Je veux gérer mon supermarché"
 ];
