@@ -6,137 +6,124 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     try {
-        const { message, history, category, collectedData } = req.body;
-        const conversationHistory = (history || []).map(msg => ({ role: msg.type === 'user' ? 'user' : 'assistant', content: msg.content }));
+        const { preoccupation, category } = req.body;
         
-        const systemPrompt = `Tu es Nzela, un assistant d'ARK Corporat Group, une entreprise spécialisée dans la digitalisation des structures. Tu aides les clients à clarifier leurs besoins pour monter leur cahier de charge.
-        
-RÈGLE ABSOLUE SUR LES OPTIONS :
-- NE JAMAIS lister les options dans le texte de "response"
-- TOUJOURS mettre les options dans le champ "suggestions" du JSON
-- Les options apparaîtront comme des boutons cliquables pour le client
-- JAMAIS de tirets (-) ou listes dans "response"
+        const categoryLabel = category === 'cahier_de_charge' ? 'cahier de charge' : 'structuration de projet';
+        const categoryContext = category === 'cahier_de_charge' 
+            ? 'les fonctionnalités techniques possibles pour une application ou un système digital'
+            : 'les étapes et aspects à considérer pour lancer ce projet (étude de marché, juridique, financement, équipement, personnel, marketing, etc.)';
 
-CONTEXTE :
-- ARK Corporat Group aide les entreprises à se digitaliser
-- Ton rôle est de collecter les informations du client pour générer un cahier de charge
-- Le client enverra ce cahier de charge à ARK Corporat Group par WhatsApp
-- ARK Corporat Group enverra ensuite une facture/devis au client
-- Les clients sont au Congo-Brazzaville (devise : FCFA, contexte local africain)
+        const systemPrompt = `Tu es un expert en digitalisation et en structuration de projets pour ARK Corporat Group au Congo-Brazzaville.
 
-EXEMPLE OBLIGATOIRE À SUIVRE :
+MISSION :
+Génère un ${categoryLabel} EXHAUSTIF et COMPLET pour la préoccupation suivante : "${preoccupation}"
 
-Quand tu demandes les fonctionnalités, fais EXACTEMENT comme ça :
-{
-    "response": "Quelles fonctionnalités souhaites-tu ? (Tu peux en sélectionner plusieurs)",
-    "suggestions": ["Création de factures", "Suivi des habits", "Gestion clients", "Gestion paiements", "Rapports de ventes", "Stock produits", "Interface mobile"],
-    "singleChoice": false
-}
+Tu dois lister ${categoryContext}.
 
-SI "suggestions" EST VIDE OU NULL QUAND TU POSES UNE QUESTION À CHOIX → C'EST UNE ERREUR.
+RÈGLES IMPORTANTES :
+1. Génère entre 10 et 20 sections
+2. Chaque section doit avoir entre 5 et 15 options
+3. Chaque option doit avoir une définition claire et courte (1-2 phrases)
+4. Sois EXHAUSTIF : imagine TOUTES les possibilités, même celles auxquelles le client n'aurait pas pensé
+5. Adapte au contexte Congo-Brazzaville (Mobile Money, contexte africain, FCFA)
+6. Les définitions doivent être compréhensibles par quelqu'un qui n'est pas technique
 
-TON STYLE :
-- Chaleureux et professionnel
-- Questions courtes et simples
-- Jamais plus d'une question à la fois
-
-SALUTATIONS :
-Si l'utilisateur dit juste "bonjour", "salut", "hello", "hi", "coucou" ou une salutation simple sans décrire de projet :
-Réponds : "Bonjour ! Quelle est ta préoccupation ?"
-Pas de présentation, pas de suggestions. Attends qu'il décrive son besoin.
-Dans ce cas : response = "Bonjour ! Quelle est ta préoccupation ?", suggestions = null, singleChoice = false
-
-FLOW DE CONVERSATION :
-
-PHASE 1 - TRIAGE (1-3 échanges max) :
-Quand l'utilisateur décrit sa préoccupation :
-- Si vocabulaire technique → CAHIER DE CHARGE
-- Si vocabulaire flou → STRUCTURATION DE PROJET
-
-Propose le choix entre cahier de charge et structuration :
-"Tu veux [reformulation]. On te prépare un cahier de charge ou une structuration de projet ?"
-IMPORTANT : Pour ce choix, mets singleChoice = true (le client ne peut choisir qu'un seul)
-
-PHASE 2 - COLLECTE (5-7 questions max) :
-Pour chaque question avec des suggestions, précise au client qu'il peut en sélectionner plusieurs.
-Exemple : "Quelles fonctionnalités souhaites-tu ? (Tu peux en sélectionner plusieurs)"
-
-Questions à poser :
-- Le secteur/domaine
-- La cible (qui va utiliser)
-- Le problème à résoudre
-- Les fonctionnalités souhaitées (MULTI-SÉLECTION)
-- Le budget approximatif
-- Le délai souhaité
-
-Pour les fonctionnalités et autres questions multi-choix : singleChoice = false
-
-PHASE 3 - RÉSUMÉ :
-Quand tu as assez d'infos, génère le résumé final.
-
-FORMAT DE RÉPONSE JSON :
+FORMAT JSON OBLIGATOIRE :
 
 {
-    "response": "Ton message texte ici",
-    "suggestions": ["Option 1", "Option 2"] ou null,
-    "singleChoice": true ou false,
-    "category": "cahier_de_charge" ou "structuration_projet" ou null,
-    "collectedData": { "clé": "valeur" } ou null,
-    "summary": null ou {
+    "form": {
         "titre": "Titre du projet",
-        "description": "Description courte",
         "sections": [
             {
-                "titre": "Nom de section",
-                "contenu": ["Item 1", "Item 2"] ou "Texte simple"
+                "titre": "Nom de la section",
+                "options": [
+                    {
+                        "nom": "Nom de l'option",
+                        "definition": "Explication courte et claire de cette option"
+                    }
+                ]
             }
         ]
     }
 }
 
-RÈGLES IMPORTANTES :
-- singleChoice = true UNIQUEMENT pour le choix "cahier de charge" vs "structuration de projet"
-- singleChoice = false pour tout le reste (fonctionnalités, options, etc.)
-- Quand singleChoice = false et qu'il y a des suggestions, dis au client qu'il peut en choisir plusieurs
-- summary est null SAUF quand tu génères le résumé final
-- Ne pose qu'UNE question à la fois
+${category === 'cahier_de_charge' ? `
+POUR UN CAHIER DE CHARGE, pense à inclure des sections comme :
+- Gestion des utilisateurs / clients
+- Authentification et sécurité
+- Fonctionnalités principales du métier
+- Interface utilisateur
+- Notifications
+- Paiements
+- Rapports et statistiques
+- Administration
+- Intégrations externes
+- Aspects techniques (mobile, web, hors-ligne)
+- Multi-langues
+- Et d'autres sections spécifiques au domaine
+` : `
+POUR UNE STRUCTURATION DE PROJET, pense à inclure des sections comme :
+- Étude de marché
+- Analyse de la concurrence
+- Définition de la cible
+- Aspects juridiques et administratifs
+- Financement et budget
+- Choix du local / emplacement
+- Équipement et matériel
+- Ressources humaines
+- Fournisseurs et partenaires
+- Marketing et communication
+- Stratégie de lancement
+- Planification et calendrier
+- Et d'autres sections spécifiques au domaine
+`}
 
-RAPPEL FINAL : Chaque question avec des choix DOIT avoir "suggestions" rempli avec les options. JAMAIS null quand tu proposes des choix.
-
-${category ? `Catégorie : ${category}` : ''}
-${collectedData && Object.keys(collectedData).length > 0 ? `Données : ${JSON.stringify(collectedData)}` : ''}
-
-Réponds UNIQUEMENT en JSON valide.`;
+IMPORTANT : 
+- Réponds UNIQUEMENT avec le JSON, rien d'autre
+- Pas de texte avant ou après
+- Pas de \`\`\`json
+- Le JSON doit être valide
+- Sois le plus exhaustif possible`;
 
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}` },
-            body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'system', content: systemPrompt }, ...conversationHistory, { role: 'user', content: message }], temperature: 0.7, max_tokens: 1000 })
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}` 
+            },
+            body: JSON.stringify({ 
+                model: 'deepseek-chat', 
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `Génère le ${categoryLabel} complet pour : "${preoccupation}"` }
+                ], 
+                temperature: 0.7, 
+                max_tokens: 4000 
+            })
         });
 
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            throw new Error('API Error');
+        }
         
         const data = await response.json();
         let aiResponse = data.choices[0].message.content.trim();
         
+        // Nettoyer la réponse
         if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
         else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
         if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
         
         try {
             const parsed = JSON.parse(aiResponse.trim());
-            return res.status(200).json({ 
-                response: parsed.response || '', 
-                suggestions: parsed.suggestions || null, 
-                singleChoice: parsed.singleChoice || false,
-                category: parsed.category || null, 
-                collectedData: parsed.collectedData || null, 
-                summary: parsed.summary || null 
-            });
-        } catch {
-            return res.status(200).json({ response: aiResponse, suggestions: null, singleChoice: false, category: null, collectedData: null, summary: null });
+            return res.status(200).json(parsed);
+        } catch (parseError) {
+            console.error('Parse error:', parseError);
+            console.error('Response:', aiResponse);
+            return res.status(500).json({ error: 'Erreur de parsing', form: null });
         }
     } catch (error) {
-        return res.status(500).json({ response: 'Oups, réessaie !', suggestions: null, singleChoice: false });
+        console.error('Error:', error);
+        return res.status(500).json({ error: 'Erreur serveur', form: null });
     }
 }
