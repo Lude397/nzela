@@ -426,6 +426,26 @@
     100% { background-position: -200% 0; }
 }
 .progress-percent {
+    /* Remplissage circulaire du logo */
+.loading-screen .logo {
+    position: relative;
+    overflow: hidden;
+}
+.loading-screen .logo::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--fill, 100%);
+    background: rgba(13, 13, 13, 0.4);
+    transition: height 0.3s ease;
+    z-index: 1;
+}
+.loading-screen .logo span {
+    position: relative;
+    z-index: 2;
+}
     text-align: center;
     margin-top: 12px;
     font-size: 24px;
@@ -1080,6 +1100,7 @@
         progress = Math.min(progress, 92);
         progressFill.style.width = progress + '%';
         progressPercent.textContent = Math.floor(progress);
+        document.querySelector('.loading-screen .logo').style.setProperty('--fill', (100 - progress) + '%');
         
         // Changer le message selon la progression
         if (progress > 30 && messageIndex === 0) {
