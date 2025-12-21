@@ -882,6 +882,7 @@
         const state = {
             preoccupation: '',
             category: null,
+            pendingCategory: null,
             formData: null,
             chatHistory: [],
             loadingInterval: null
@@ -1022,6 +1023,17 @@
                 
                 if (data.action === 'ask_clarification') {
                     addChatMessage('ai', data.response);
+                } else if (data.action === 'confirm_choice') {
+                    state.preoccupation = data.preoccupation || message;
+                    state.pendingCategory = data.detected_category;
+                    addChatMessage('ai', data.response);
+                } else if (data.action === 'confirmed') {
+                    if (state.pendingCategory) {
+                        state.category = state.pendingCategory;
+                        switchScreen('loading');
+                        startLoadingAnimation();
+                        generateForm();
+                    }
                 } else if (data.action === 'proceed') {
                     state.preoccupation = data.preoccupation || message;
                     elements.choiceContext.textContent = `"${state.preoccupation}"`;
