@@ -376,82 +376,50 @@
         }
         .loading-screen.visible { display: flex; }
 
-        .loading-spinner {
-            width: 50px; height: 50px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
+        /* Logo avec remplissage circulaire */
+        .loading-screen .logo {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .loading-screen .logo::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--fill, 0%);
+            background: rgba(255, 255, 255, 0.35);
+            transition: height 0.3s ease;
+            z-index: 1;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .loading-screen .logo span {
+            position: relative;
+            z-index: 2;
+            font-size: 52px;
         }
-        .loading-text {
-            color: var(--text-secondary);
-            font-size: 15px;
-            text-align: center;
-            transition: opacity 0.3s ease;
-        }
-        .loading-step {
-            margin-top: 8px;
-            font-size: 13px;
-            color: var(--text-muted);
 
-        /* Barre de progression */
-.progress-container {
-    width: 100%;
-    max-width: 300px;
-    margin-top: 30px;
-}
-.progress-bar {
-    height: 8px;
-    background: var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent) 0%, #e8c9a8 50%, var(--accent) 100%);
-    background-size: 200% 100%;
-    border-radius: 10px;
-    width: 0%;
-    transition: width 0.3s ease;
-    animation: shimmer 2s infinite;
-    box-shadow: 0 0 15px var(--accent-glow);
-}
-@keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-.progress-percent {
-    /* Remplissage circulaire du logo */
-.loading-screen .logo {
-    position: relative;
-    overflow: hidden;
-}
-.loading-screen .logo::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: var(--fill, 100%);
-    background: rgba(13, 13, 13, 0.4);
-    transition: height 0.3s ease;
-    z-index: 1;
-}
-.loading-screen .logo span {
-    position: relative;
-    z-index: 2;
-}
-    text-align: center;
-    margin-top: 12px;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--accent);
-}
+        /* Texte avec effet karaoké */
+        .loading-text {
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(90deg, var(--accent) var(--text-fill, 0%), var(--text-muted) var(--text-fill, 0%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Pourcentage */
+        .loading-percent {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 20px;
         }
 
         /* ===== ÉCRAN FORMULAIRE ===== */
@@ -867,17 +835,12 @@
             </div>
         </div>
 
-       <!-- Écran de chargement -->
-<div class="loading-screen" id="loadingScreen">
-    <div class="logo"><span>N</span></div>
-    <p class="loading-text" id="loadingText">Analyse de ton projet...</p>
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
+        <!-- Écran de chargement -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="logo"><span>N</span></div>
+            <p class="loading-text" id="loadingText">Analyse de ton projet...</p>
+            <p class="loading-percent" id="loadingPercent">0%</p>
         </div>
-        <p class="progress-percent"><span id="progressPercent">0</span>%</p>
-    </div>
-</div>
 
         <!-- Écran formulaire -->
         <div class="form-screen" id="formScreen">
@@ -938,6 +901,7 @@
             btnStructuration: document.getElementById('btnStructuration'),
             loadingScreen: document.getElementById('loadingScreen'),
             loadingText: document.getElementById('loadingText'),
+            loadingPercent: document.getElementById('loadingPercent'),
             formScreen: document.getElementById('formScreen'),
             formTitle: document.getElementById('formTitle'),
             formBadge: document.getElementById('formBadge'),
@@ -949,9 +913,9 @@
 
         // Messages de progression
         const LOADING_MESSAGES = [
-            { text: "Analyse de ton projet...", step: "Étape 1/3" },
-            { text: "Génération des sections...", step: "Étape 2/3" },
-            { text: "Presque terminé...", step: "Étape 3/3" }
+            "Analyse de ton projet...",
+            "Génération des sections...",
+            "Presque terminé..."
         ];
 
         // Initialisation
@@ -1077,54 +1041,61 @@
             generateForm();
         }
 
-       function startLoadingAnimation() {
-    let progress = 0;
-    let messageIndex = 0;
-    const progressFill = document.getElementById('progressFill');
-    const progressPercent = document.getElementById('progressPercent');
-    
-    elements.loadingText.textContent = LOADING_MESSAGES[0].text;
-    
-    state.loadingInterval = setInterval(() => {
-        // Progression plus rapide au début, ralentit vers la fin
-        if (progress < 30) {
-            progress += Math.random() * 8 + 4;
-        } else if (progress < 60) {
-            progress += Math.random() * 5 + 2;
-        } else if (progress < 85) {
-            progress += Math.random() * 3 + 1;
-        } else if (progress < 92) {
-            progress += Math.random() * 0.5;
+        function startLoadingAnimation() {
+            let progress = 0;
+            let messageIndex = 0;
+            const logo = document.querySelector('.loading-screen .logo');
+            
+            elements.loadingText.textContent = LOADING_MESSAGES[0];
+            elements.loadingPercent.textContent = '0%';
+            
+            state.loadingInterval = setInterval(() => {
+                // Progression plus rapide au début, ralentit vers la fin
+                if (progress < 30) {
+                    progress += Math.random() * 8 + 4;
+                } else if (progress < 60) {
+                    progress += Math.random() * 5 + 2;
+                } else if (progress < 85) {
+                    progress += Math.random() * 3 + 1;
+                } else if (progress < 92) {
+                    progress += Math.random() * 0.5;
+                }
+                
+                progress = Math.min(progress, 92);
+                const progressInt = Math.floor(progress);
+                
+                // Mise à jour du pourcentage
+                elements.loadingPercent.textContent = progressInt + '%';
+                
+                // Remplissage du cercle N (de bas en haut)
+                logo.style.setProperty('--fill', progress + '%');
+                
+                // Remplissage du texte (effet karaoké)
+                elements.loadingText.style.setProperty('--text-fill', progress + '%');
+                
+                // Changer le message selon la progression
+                if (progress > 30 && messageIndex === 0) {
+                    messageIndex = 1;
+                    elements.loadingText.textContent = LOADING_MESSAGES[1];
+                } else if (progress > 70 && messageIndex === 1) {
+                    messageIndex = 2;
+                    elements.loadingText.textContent = LOADING_MESSAGES[2];
+                }
+            }, 200);
         }
-        
-        progress = Math.min(progress, 92);
-        progressFill.style.width = progress + '%';
-        progressPercent.textContent = Math.floor(progress);
-        document.querySelector('.loading-screen .logo').style.setProperty('--fill', (100 - progress) + '%');
-        
-        // Changer le message selon la progression
-        if (progress > 30 && messageIndex === 0) {
-            messageIndex = 1;
-            elements.loadingText.textContent = LOADING_MESSAGES[1].text;
-        } else if (progress > 70 && messageIndex === 1) {
-            messageIndex = 2;
-            elements.loadingText.textContent = LOADING_MESSAGES[2].text;
-        }
-    }, 200);
-}
 
-function stopLoadingAnimation() {
-    if (state.loadingInterval) {
-        clearInterval(state.loadingInterval);
-        state.loadingInterval = null;
-        
-        // Compléter à 100%
-        const progressFill = document.getElementById('progressFill');
-        const progressPercent = document.getElementById('progressPercent');
-        progressFill.style.width = '100%';
-        progressPercent.textContent = '100';
-    }
-}
+        function stopLoadingAnimation() {
+            if (state.loadingInterval) {
+                clearInterval(state.loadingInterval);
+                state.loadingInterval = null;
+                
+                // Compléter à 100%
+                const logo = document.querySelector('.loading-screen .logo');
+                elements.loadingPercent.textContent = '100%';
+                logo.style.setProperty('--fill', '100%');
+                elements.loadingText.style.setProperty('--text-fill', '100%');
+            }
+        }
 
         async function generateForm() {
             try {
