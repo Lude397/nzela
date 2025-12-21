@@ -1171,6 +1171,7 @@
             
             window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
             switchScreen('welcome');
+            elements.welcomeInput.value = '';
         }
 
         function switchScreen(screen) {
