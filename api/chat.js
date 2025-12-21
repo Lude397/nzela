@@ -51,13 +51,40 @@ const EXEMPLES = [
     "Je veux gérer mon supermarché"
 ];
 
+// Templates de sections fixes
+const SECTIONS_CAHIER_CHARGE = [
+    "Gestion des utilisateurs et clients",
+    "Authentification et sécurité",
+    "Fonctionnalités métier principales",
+    "Interface utilisateur",
+    "Paiements et transactions",
+    "Notifications et alertes",
+    "Rapports et statistiques",
+    "Administration et paramètres",
+    "Intégrations externes",
+    "Aspects techniques"
+];
+
+const SECTIONS_STRUCTURATION = [
+    "Étude de marché",
+    "Analyse de la concurrence",
+    "Aspects juridiques et administratifs",
+    "Financement et budget",
+    "Local et emplacement",
+    "Équipement et matériel",
+    "Ressources humaines",
+    "Fournisseurs et partenaires",
+    "Marketing et communication",
+    "Planification et lancement"
+];
+
 function getRandomExemple() {
     return EXEMPLES[Math.floor(Math.random() * EXEMPLES.length)];
 }
 
 async function handleAnalyze(res, message, history) {
     const systemPrompt = `Tu es Nzela, un assistant d'ARK Corporat Group au Congo-Brazzaville.
-Ta mission est de comprendre si le message de l'utilisateur contient une préoccupation claire ou non.
+Ta mission est de comprendre le message de l'utilisateur.
 
 RÈGLES :
 1. Si c'est une SALUTATION (bonjour, salut, hello, hi, coucou, bonsoir, etc.) :
@@ -68,19 +95,33 @@ RÈGLES :
    - Demande des éclaircissements avec un exemple concret
    - action = "ask_clarification"
 
-3. Si le message contient une PRÉOCCUPATION CLAIRE (ex: "je veux digitaliser mon restaurant", "je veux créer une app pour gérer mon pressing", "je veux lancer un pressing", "je veux ouvrir une boutique") :
-   - action = "proceed"
-   - Extrais la préoccupation reformulée dans le champ "preoccupation"
+3. Si le message contient une PRÉOCCUPATION CLAIRE avec TYPE DE PROJET (restaurant, pressing, boutique, salon, école, etc.) :
+   
+   a) Si l'utilisateur PRÉCISE "cahier de charge", "cahier des charges", "application", "app", "système", "digitaliser" :
+      - action = "confirm_choice"
+      - detected_category = "cahier_de_charge"
+      - response = Une phrase pour confirmer, ex: "Tu veux un cahier de charge pour ton pressing, c'est bien ça ?"
+   
+   b) Si l'utilisateur PRÉCISE "structuration", "structurer", "lancer", "ouvrir", "créer", "monter" (sans parler d'app) :
+      - action = "confirm_choice"
+      - detected_category = "structuration_projet"
+      - response = Une phrase pour confirmer, ex: "Tu veux structurer ton projet de restaurant, c'est bien ça ?"
+   
+   c) Si l'utilisateur ne précise PAS ce qu'il veut :
+      - action = "proceed"
+      - Extrais la préoccupation reformulée
 
-IMPORTANT : Dès qu'un TYPE DE PROJET est mentionné (restaurant, pressing, boutique, salon, école, etc.), c'est une préoccupation CLAIRE. Ne demande pas plus de détails.
+4. Si l'utilisateur répond "oui", "ouais", "c'est ça", "exactement", "correct", "affirmatif", "yes", "ok" à une question de confirmation :
+   - action = "confirmed"
 
-EXEMPLE D'ÉCHANGE ALÉATOIRE À UTILISER : "${getRandomExemple()}"
+EXEMPLE : "${getRandomExemple()}"
 
 FORMAT JSON OBLIGATOIRE :
 {
-    "action": "ask_clarification" ou "proceed",
-    "response": "Ta réponse texte (seulement si ask_clarification)",
-    "preoccupation": "La préoccupation claire extraite (seulement si proceed)"
+    "action": "ask_clarification" | "proceed" | "confirm_choice" | "confirmed",
+    "response": "Ta réponse texte (si ask_clarification ou confirm_choice)",
+    "preoccupation": "La préoccupation extraite (si proceed ou confirm_choice)",
+    "detected_category": "cahier_de_charge" | "structuration_projet" (seulement si confirm_choice)
 }
 
 STYLE :
@@ -134,38 +175,35 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
 }
 
 async function handleForm(res, preoccupation, category) {
+    const sections = category === 'cahier_de_charge' ? SECTIONS_CAHIER_CHARGE : SECTIONS_STRUCTURATION;
     const categoryLabel = category === 'cahier_de_charge' ? 'cahier de charge' : 'structuration de projet';
-    const categoryContext = category === 'cahier_de_charge' 
-        ? 'les fonctionnalités techniques possibles pour une application ou un système digital'
-        : 'les étapes et aspects à considérer pour lancer ce projet (étude de marché, juridique, financement, équipement, personnel, marketing, etc.)';
 
-    const systemPrompt = `Tu es un expert en digitalisation et en structuration de projets pour ARK Corporat Group au Congo-Brazzaville.
+    const systemPrompt = `Tu es un expert en digitalisation et structuration de projets pour ARK Corporat Group au Congo-Brazzaville.
 
 MISSION :
-Génère un ${categoryLabel} EXHAUSTIF et COMPLET pour la préoccupation suivante : "${preoccupation}"
+Génère les OPTIONS pour chaque section du ${categoryLabel} suivant : "${preoccupation}"
 
-Tu dois lister ${categoryContext}.
+SECTIONS IMPOSÉES (tu dois TOUTES les utiliser) :
+${sections.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
-RÈGLES IMPORTANTES :
-1. Génère entre 8 et 12 sections
-2. Chaque section doit avoir entre 5 et 8 options
-3. Chaque option doit avoir une définition claire et courte (1-2 phrases)
-4. Sois EXHAUSTIF : imagine TOUTES les possibilités, même celles auxquelles le client n'aurait pas pensé
-5. Adapte au contexte Congo-Brazzaville (Mobile Money, contexte africain, FCFA)
-6. Les définitions doivent être compréhensibles par quelqu'un qui n'est pas technique
+RÈGLES :
+1. Utilise EXACTEMENT ces ${sections.length} sections, dans cet ordre
+2. Pour chaque section, génère 5 à 8 options SPÉCIFIQUES au projet "${preoccupation}"
+3. Chaque option a un nom et une définition courte (1-2 phrases)
+4. Adapte au contexte Congo-Brazzaville (Mobile Money, FCFA, réalités locales)
+5. Sois EXHAUSTIF et CRÉATIF pour chaque option
 
 FORMAT JSON OBLIGATOIRE :
-
 {
     "form": {
         "titre": "Titre du projet",
         "sections": [
             {
-                "titre": "Nom de la section",
+                "titre": "Nom de la section (utilise ceux imposés)",
                 "options": [
                     {
                         "nom": "Nom de l'option",
-                        "definition": "Explication courte et claire de cette option"
+                        "definition": "Explication courte"
                     }
                 ]
             }
@@ -173,43 +211,10 @@ FORMAT JSON OBLIGATOIRE :
     }
 }
 
-${category === 'cahier_de_charge' ? `
-POUR UN CAHIER DE CHARGE, pense à inclure des sections comme :
-- Gestion des utilisateurs / clients
-- Authentification et sécurité
-- Fonctionnalités principales du métier
-- Interface utilisateur
-- Notifications
-- Paiements (Mobile Money, Cash, etc.)
-- Rapports et statistiques
-- Administration
-- Intégrations externes (WhatsApp, SMS, etc.)
-- Aspects techniques (mobile, web, hors-ligne)
-- Multi-langues
-- Et d'autres sections spécifiques au domaine
-` : `
-POUR UNE STRUCTURATION DE PROJET, pense à inclure des sections comme :
-- Étude de marché
-- Analyse de la concurrence
-- Définition de la cible
-- Aspects juridiques et administratifs
-- Financement et budget
-- Choix du local / emplacement
-- Équipement et matériel
-- Ressources humaines
-- Fournisseurs et partenaires
-- Marketing et communication
-- Stratégie de lancement
-- Planification et calendrier
-- Et d'autres sections spécifiques au domaine
-`}
-
-IMPORTANT : 
-- Réponds UNIQUEMENT avec le JSON, rien d'autre
-- Pas de texte avant ou après
+IMPORTANT :
+- JSON valide uniquement
 - Pas de backticks
-- Le JSON doit être valide
-- Sois le plus exhaustif possible`;
+- Pas de texte avant/après`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
