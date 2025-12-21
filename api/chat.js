@@ -13,9 +13,9 @@ export default async function handler(req, res) {
             return await handleAnalyze(res, message, history);
         }
         
-        // MODE FORMULAIRE : Générer le formulaire exhaustif
+        // MODE FORMULAIRE STREAMING : Générer le formulaire en streaming
         if (mode === 'form') {
-            return await handleForm(res, preoccupation, category);
+            return await handleFormStream(res, preoccupation, category);
         }
 
         return res.status(400).json({ error: 'Mode invalide' });
@@ -68,9 +68,11 @@ RÈGLES :
    - Demande des éclaircissements avec un exemple concret
    - action = "ask_clarification"
 
-3. Si le message contient une PRÉOCCUPATION CLAIRE (ex: "je veux digitaliser mon restaurant", "je veux créer une app pour gérer mon pressing") :
+3. Si le message contient une PRÉOCCUPATION CLAIRE (ex: "je veux digitaliser mon restaurant", "je veux créer une app pour gérer mon pressing", "je veux lancer un pressing", "je veux ouvrir une boutique") :
    - action = "proceed"
    - Extrais la préoccupation reformulée dans le champ "preoccupation"
+
+IMPORTANT : Dès qu'un TYPE DE PROJET est mentionné (restaurant, pressing, boutique, salon, école, etc.), c'est une préoccupation CLAIRE. Ne demande pas plus de détails.
 
 EXEMPLE D'ÉCHANGE ALÉATOIRE À UTILISER : "${getRandomExemple()}"
 
@@ -131,7 +133,7 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
     }
 }
 
-async function handleForm(res, preoccupation, category) {
+async function handleFormStream(res, preoccupation, category) {
     const categoryLabel = category === 'cahier_de_charge' ? 'cahier de charge' : 'structuration de projet';
     const categoryContext = category === 'cahier_de_charge' 
         ? 'les fonctionnalités techniques possibles pour une application ou un système digital'
@@ -209,38 +211,74 @@ IMPORTANT :
 - Le JSON doit être valide
 - Sois le plus exhaustif possible`;
 
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}` 
-        },
-        body: JSON.stringify({ 
-            model: 'deepseek-chat', 
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: `Génère le ${categoryLabel} complet pour : "${preoccupation}"` }
-            ], 
-            temperature: 0.7, 
-            max_tokens: 4000 
-        })
-    });
+    // Configuration SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-    if (!response.ok) throw new Error('API Error');
-    
-    const data = await response.json();
-    let aiResponse = data.choices[0].message.content.trim();
-    
-    // Nettoyer la réponse
-    if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
-    else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
-    if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
-    
     try {
-        const parsed = JSON.parse(aiResponse.trim());
-        return res.status(200).json(parsed);
-    } catch (parseError) {
-        console.error('Parse error:', parseError);
-        return res.status(500).json({ error: 'Erreur de parsing', form: null });
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}` 
+            },
+            body: JSON.stringify({ 
+                model: 'deepseek-chat', 
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `Génère le ${categoryLabel} complet pour : "${preoccupation}"` }
+                ], 
+                temperature: 0.7, 
+                max_tokens: 4000,
+                stream: true
+            })
+        });
+
+        if (!response.ok) {
+            res.write(`data: ${JSON.stringify({ error: 'API Error' })}\n\n`);
+            res.end();
+            return;
+        }
+
+        let fullContent = '';
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.slice(6);
+                    if (data === '[DONE]') continue;
+                    
+                    try {
+                        const parsed = JSON.parse(data);
+                        const content = parsed.choices?.[0]?.delta?.content || '';
+                        if (content) {
+                            fullContent += content;
+                            // Envoyer le chunk au client
+                            res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+                        }
+                    } catch (e) {
+                        // Ignorer les erreurs de parsing des chunks
+                    }
+                }
+            }
+        }
+
+        // Envoyer le signal de fin
+        res.write(`data: ${JSON.stringify({ done: true, fullContent })}\n\n`);
+        res.end();
+
+    } catch (error) {
+        console.error('Stream error:', error);
+        res.write(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`);
+        res.end();
     }
 }
