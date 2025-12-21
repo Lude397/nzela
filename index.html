@@ -365,6 +365,40 @@
             color: var(--text-muted);
         }
 
+        /* ===== ÉCRAN LOADING ===== */
+        .loading-screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+        }
+        .loading-screen.visible { display: flex; }
+
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 15px;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+        .loading-step {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
         /* ===== ÉCRAN FORMULAIRE ===== */
         .form-screen {
             flex: 1;
@@ -429,33 +463,6 @@
             font-size: 14px;
         }
 
-        /* Streaming indicator */
-        .streaming-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 12px;
-        }
-        .streaming-indicator.hidden { display: none; }
-        .streaming-spinner {
-            width: 20px; height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .streaming-text {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
         /* Sections */
         .section {
             background: var(--bg-card);
@@ -464,15 +471,9 @@
             margin-bottom: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
-            animation: fadeInUp 0.4s ease forwards;
         }
         .section:hover {
             border-color: var(--accent);
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .section-header {
@@ -597,6 +598,9 @@
             transition: color 0.2s;
         }
         .option:hover .option-label {
+            color: var(--text-primary);
+        }
+        .checkbox-wrapper input:checked ~ .option-content .option-label {
             color: var(--text-primary);
         }
 
@@ -724,6 +728,26 @@
             width: 22px; height: 22px;
         }
 
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .section:nth-child(1) { animation-delay: 0.05s; }
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.15s; }
+        .section:nth-child(4) { animation-delay: 0.2s; }
+        .section:nth-child(5) { animation-delay: 0.25s; }
+        .section:nth-child(6) { animation-delay: 0.3s; }
+        .section:nth-child(7) { animation-delay: 0.35s; }
+        .section:nth-child(8) { animation-delay: 0.4s; }
+        .section:nth-child(9) { animation-delay: 0.45s; }
+        .section:nth-child(10) { animation-delay: 0.5s; }
+
         /* Responsive */
         @media (max-width: 480px) {
             .choice-buttons { flex-direction: column; }
@@ -788,6 +812,13 @@
             </div>
         </div>
 
+        <!-- Écran de chargement -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loadingText">Analyse de ton projet...</p>
+            <p class="loading-step" id="loadingStep">Étape 1/3</p>
+        </div>
+
         <!-- Écran formulaire -->
         <div class="form-screen" id="formScreen">
             <div class="form-header">
@@ -801,10 +832,6 @@
                 <div class="form-instructions">
                     <h2>Comment ça marche</h2>
                     <p>Parcourez chaque section, cochez les options souhaitées, et ajoutez vos propres idées si nécessaire.</p>
-                </div>
-                <div class="streaming-indicator" id="streamingIndicator">
-                    <div class="streaming-spinner"></div>
-                    <span class="streaming-text">Génération des sections en cours...</span>
                 </div>
                 <div id="sectionsContainer"></div>
             </div>
@@ -834,7 +861,7 @@
             category: null,
             formData: null,
             chatHistory: [],
-            renderedSections: 0
+            loadingInterval: null
         };
 
         const elements = {
@@ -849,15 +876,24 @@
             choiceContext: document.getElementById('choiceContext'),
             btnCahier: document.getElementById('btnCahier'),
             btnStructuration: document.getElementById('btnStructuration'),
+            loadingScreen: document.getElementById('loadingScreen'),
+            loadingText: document.getElementById('loadingText'),
+            loadingStep: document.getElementById('loadingStep'),
             formScreen: document.getElementById('formScreen'),
             formTitle: document.getElementById('formTitle'),
             formBadge: document.getElementById('formBadge'),
             sectionsContainer: document.getElementById('sectionsContainer'),
-            streamingIndicator: document.getElementById('streamingIndicator'),
             totalCount: document.getElementById('totalCount'),
             submitBtn: document.getElementById('submitBtn'),
             tooltip: document.getElementById('tooltip')
         };
+
+        // Messages de progression
+        const LOADING_MESSAGES = [
+            { text: "Analyse de ton projet...", step: "Étape 1/3" },
+            { text: "Génération des sections...", step: "Étape 2/3" },
+            { text: "Presque terminé...", step: "Étape 3/3" }
+        ];
 
         // Initialisation
         function init() {
@@ -977,19 +1013,33 @@
 
         function handleCategoryChoice(category) {
             state.category = category;
-            state.renderedSections = 0;
-            state.formData = { titre: 'Mon projet', sections: [] };
-            
-            elements.formTitle.textContent = 'Mon projet';
-            elements.formBadge.textContent = category === 'cahier_de_charge' ? 'Cahier de charge' : 'Structuration de projet';
-            elements.sectionsContainer.innerHTML = '';
-            elements.streamingIndicator.classList.remove('hidden');
-            
-            switchScreen('form');
-            generateFormStream();
+            switchScreen('loading');
+            startLoadingAnimation();
+            generateForm();
         }
 
-        async function generateFormStream() {
+        function startLoadingAnimation() {
+            let step = 0;
+            elements.loadingText.textContent = LOADING_MESSAGES[0].text;
+            elements.loadingStep.textContent = LOADING_MESSAGES[0].step;
+            
+            state.loadingInterval = setInterval(() => {
+                step++;
+                if (step < LOADING_MESSAGES.length) {
+                    elements.loadingText.textContent = LOADING_MESSAGES[step].text;
+                    elements.loadingStep.textContent = LOADING_MESSAGES[step].step;
+                }
+            }, 3000); // Change toutes les 3 secondes
+        }
+
+        function stopLoadingAnimation() {
+            if (state.loadingInterval) {
+                clearInterval(state.loadingInterval);
+                state.loadingInterval = null;
+            }
+        }
+
+        async function generateForm() {
             try {
                 const response = await fetch(CONFIG.apiUrl, {
                     method: 'POST',
@@ -1000,163 +1050,77 @@
                         category: state.category
                     })
                 });
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let fullContent = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(6));
-                                
-                                if (data.chunk) {
-                                    fullContent += data.chunk;
-                                    tryParseAndRender(fullContent);
-                                }
-                                
-                                if (data.done) {
-                                    elements.streamingIndicator.classList.add('hidden');
-                                    finalizeForm(fullContent);
-                                }
-                                
-                                if (data.error) {
-                                    elements.streamingIndicator.classList.add('hidden');
-                                    alert('Erreur lors de la génération. Réessaie !');
-                                    switchScreen('welcome');
-                                }
-                            } catch (e) {
-                                // Ignorer les erreurs de parsing
-                            }
-                        }
-                    }
+                
+                const data = await response.json();
+                stopLoadingAnimation();
+                
+                if (data.form) {
+                    state.formData = data.form;
+                    renderForm(data.form);
+                    switchScreen('form');
+                } else {
+                    alert('Erreur lors de la génération. Réessaie !');
+                    switchScreen('welcome');
                 }
             } catch (error) {
+                stopLoadingAnimation();
                 console.error('Erreur:', error);
-                elements.streamingIndicator.classList.add('hidden');
                 alert('Erreur de connexion. Réessaie !');
                 switchScreen('welcome');
             }
         }
 
-        function tryParseAndRender(content) {
-            // Nettoyer le contenu
-            let cleanContent = content.trim();
-            if (cleanContent.startsWith('```json')) cleanContent = cleanContent.slice(7);
-            else if (cleanContent.startsWith('```')) cleanContent = cleanContent.slice(3);
-            if (cleanContent.endsWith('```')) cleanContent = cleanContent.slice(0, -3);
+        function renderForm(form) {
+            elements.formTitle.textContent = form.titre || 'Mon projet';
+            elements.formBadge.textContent = state.category === 'cahier_de_charge' ? 'Cahier de charge' : 'Structuration de projet';
             
-            try {
-                // Essayer de trouver des sections complètes
-                const sectionsMatch = cleanContent.match(/"sections"\s*:\s*\[([\s\S]*)/);
-                if (!sectionsMatch) return;
-
-                // Extraire le titre si disponible
-                const titreMatch = cleanContent.match(/"titre"\s*:\s*"([^"]+)"/);
-                if (titreMatch && elements.formTitle.textContent === 'Mon projet') {
-                    elements.formTitle.textContent = titreMatch[1];
-                    state.formData.titre = titreMatch[1];
-                }
-
-                // Trouver les sections complètes
-                const sectionsContent = sectionsMatch[1];
-                const sectionRegex = /\{\s*"titre"\s*:\s*"([^"]+)"\s*,\s*"options"\s*:\s*\[((?:[^[\]]*|\[(?:[^[\]]*|\[[^\]]*\])*\])*)\]\s*\}/g;
+            let html = '';
+            form.sections.forEach((section, sIndex) => {
+                const escapedOptions = section.options.map(opt => ({
+                    nom: opt.nom,
+                    definition: opt.definition.replace(/'/g, "\\'").replace(/"/g, '&quot;')
+                }));
                 
-                let match;
-                let sectionIndex = 0;
-                
-                while ((match = sectionRegex.exec(sectionsContent)) !== null) {
-                    if (sectionIndex >= state.renderedSections) {
-                        try {
-                            const sectionJson = match[0];
-                            const section = JSON.parse(sectionJson);
-                            
-                            if (section.titre && section.options && section.options.length > 0) {
-                                state.formData.sections.push(section);
-                                renderSection(section, state.renderedSections);
-                                state.renderedSections++;
-                            }
-                        } catch (e) {
-                            // Section pas encore complète
-                        }
-                    }
-                    sectionIndex++;
-                }
-            } catch (e) {
-                // Pas encore assez de contenu
-            }
-        }
-
-        function renderSection(section, index) {
-            const escapedOptions = section.options.map(opt => ({
-                nom: opt.nom,
-                definition: (opt.definition || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
-            }));
-
-            const html = `
-                <div class="section" data-section="${index}">
-                    <div class="section-header" onclick="toggleSection(${index})">
-                        <div class="section-title">
-                            <span class="section-number">${index + 1}</span>
-                            <span class="section-name">${section.titre}</span>
-                        </div>
-                        <span class="section-count" id="count-${index}">0 sélectionné(s)</span>
-                        <span class="section-arrow">▼</span>
-                    </div>
-                    <div class="section-content">
-                        <div class="section-inner">
-                            ${section.options.map((opt, oIndex) => `
-                                <div class="option">
-                                    <label class="checkbox-wrapper">
-                                        <input type="checkbox" name="option" value="${index}|${opt.nom}" onchange="updateCounts()">
-                                        <span class="checkbox-custom">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                            </svg>
-                                        </span>
-                                    </label>
-                                    <div class="option-content" onclick="toggleCheckbox(this)">
-                                        <span class="option-label">${opt.nom}</span>
-                                    </div>
-                                    <span class="option-help" onclick="event.stopPropagation(); showTooltip(event, '${escapedOptions[oIndex].definition}')">?</span>
-                                </div>
-                            `).join('')}
-                            <div class="add-option">
-                                <input type="text" placeholder="Ajouter un point..." id="add-input-${index}" onkeydown="if(event.key==='Enter'){addCustomOption(${index})}">
-                                <button onclick="addCustomOption(${index})">+</button>
+                html += `
+                    <div class="section" data-section="${sIndex}">
+                        <div class="section-header" onclick="toggleSection(${sIndex})">
+                            <div class="section-title">
+                                <span class="section-number">${sIndex + 1}</span>
+                                <span class="section-name">${section.titre}</span>
                             </div>
-                            <div id="custom-options-${index}"></div>
+                            <span class="section-count" id="count-${sIndex}">0 sélectionné(s)</span>
+                            <span class="section-arrow">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-inner">
+                                ${section.options.map((opt, oIndex) => `
+                                    <div class="option">
+                                        <label class="checkbox-wrapper">
+                                            <input type="checkbox" name="option" value="${sIndex}|${opt.nom}" onchange="updateCounts()">
+                                            <span class="checkbox-custom">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </span>
+                                        </label>
+                                        <div class="option-content" onclick="toggleCheckbox(this)">
+                                            <span class="option-label">${opt.nom}</span>
+                                        </div>
+                                        <span class="option-help" onclick="event.stopPropagation(); showTooltip(event, '${escapedOptions[oIndex].definition}')">?</span>
+                                    </div>
+                                `).join('')}
+                                <div class="add-option">
+                                    <input type="text" placeholder="Ajouter un point..." id="add-input-${sIndex}" onkeydown="if(event.key==='Enter'){addCustomOption(${sIndex})}">
+                                    <button onclick="addCustomOption(${sIndex})">+</button>
+                                </div>
+                                <div id="custom-options-${sIndex}"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-
-            elements.sectionsContainer.insertAdjacentHTML('beforeend', html);
-        }
-
-        function finalizeForm(content) {
-            // Nettoyer et parser le contenu final
-            let cleanContent = content.trim();
-            if (cleanContent.startsWith('```json')) cleanContent = cleanContent.slice(7);
-            else if (cleanContent.startsWith('```')) cleanContent = cleanContent.slice(3);
-            if (cleanContent.endsWith('```')) cleanContent = cleanContent.slice(0, -3);
+                `;
+            });
             
-            try {
-                const parsed = JSON.parse(cleanContent.trim());
-                if (parsed.form) {
-                    state.formData = parsed.form;
-                    elements.formTitle.textContent = parsed.form.titre || 'Mon projet';
-                }
-            } catch (e) {
-                console.log('Parse final non critique:', e);
-            }
+            elements.sectionsContainer.innerHTML = html;
         }
 
         function toggleSection(index) {
@@ -1211,8 +1175,7 @@
             document.querySelectorAll('.section').forEach(section => {
                 const index = section.dataset.section;
                 const checked = section.querySelectorAll('input[type="checkbox"]:checked').length;
-                const countEl = document.getElementById(`count-${index}`);
-                if (countEl) countEl.textContent = `${checked} sélectionné(s)`;
+                document.getElementById(`count-${index}`).textContent = `${checked} sélectionné(s)`;
             });
             
             const total = document.querySelectorAll('input[type="checkbox"]:checked').length;
@@ -1229,8 +1192,7 @@
             const bySection = {};
             checked.forEach(cb => {
                 const [sectionIndex, optionName] = cb.value.split('|');
-                const section = state.formData.sections[sectionIndex];
-                const sectionTitle = section ? section.titre : `Section ${parseInt(sectionIndex) + 1}`;
+                const sectionTitle = state.formData.sections[sectionIndex].titre;
                 if (!bySection[sectionTitle]) bySection[sectionTitle] = [];
                 bySection[sectionTitle].push(optionName);
             });
@@ -1262,11 +1224,13 @@
             elements.welcomeScreen.classList.add('hidden');
             elements.chatScreen.classList.remove('visible');
             elements.choiceScreen.classList.remove('visible');
+            elements.loadingScreen.classList.remove('visible');
             elements.formScreen.classList.remove('visible');
             
             if (screen === 'welcome') elements.welcomeScreen.classList.remove('hidden');
             else if (screen === 'chat') elements.chatScreen.classList.add('visible');
             else if (screen === 'choice') elements.choiceScreen.classList.add('visible');
+            else if (screen === 'loading') elements.loadingScreen.classList.add('visible');
             else if (screen === 'form') elements.formScreen.classList.add('visible');
         }
 
