@@ -145,8 +145,8 @@ Génère un ${categoryLabel} EXHAUSTIF et COMPLET pour la préoccupation suivant
 Tu dois lister ${categoryContext}.
 
 RÈGLES IMPORTANTES :
-1. Génère entre 10 et 20 sections
-2. Chaque section doit avoir entre 5 et 15 options
+1. Génère entre 8 et 12 sections
+2. Chaque section doit avoir entre 5 et 8 options
 3. Chaque option doit avoir une définition claire et courte (1-2 phrases)
 4. Sois EXHAUSTIF : imagine TOUTES les possibilités, même celles auxquelles le client n'aurait pas pensé
 5. Adapte au contexte Congo-Brazzaville (Mobile Money, contexte africain, FCFA)
