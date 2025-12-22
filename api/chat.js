@@ -7,14 +7,14 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     try {
-        const { mode, message, history } = req.body;
+        const { mode, message, history, docType } = req.body;
 
         if (mode === 'chat') {
             return await handleChat(res, message, history);
         }
         
         if (mode === 'generate') {
-            return await handleGenerate(res, history);
+            return await handleGenerate(res, history, docType);
         }
 
         return res.status(400).json({ error: 'Mode invalide' });
@@ -45,14 +45,8 @@ User: "Je veux créer une société de transport"
 User: "Je veux ouvrir un pressing"
 ✅ "Le pressing, c'est un service très demandé. Tu cibles les particuliers, les entreprises, ou les deux ?"
 
-User: "Je veux lancer un restaurant"
-✅ "La restauration, marché dynamique à Brazza. Quel concept : fast-food, maquis, ou restaurant classique ?"
-
 User: "Les particuliers surtout"
 ✅ "Noté. Tu prévois un service de collecte à domicile ou le client vient déposer sur place ?"
-
-User: "Collecte à domicile"
-✅ "Bonne idée, ça différencie. Quelle zone géographique tu veux couvrir au démarrage ?"
 
 ═══════════════════════════════════════════════════════════════
                     ❌ CE QU'IL NE FAUT JAMAIS FAIRE
@@ -89,18 +83,7 @@ Explore ces sujets UN PAR UN :
 Après 8-12 échanges, quand tu as couvert les points essentiels :
 
 [GENERATE]
-Bien, j'ai les éléments clés. Je te prépare le cahier de charge.
-
-═══════════════════════════════════════════════════════════════
-                    🚀 PREMIÈRE RÉPONSE
-═══════════════════════════════════════════════════════════════
-
-Format : "[Domaine], c'est [constat court]. [Question directe] ?"
-
-Exemples :
-- "Transport urbain à Brazzaville, c'est un secteur porteur. Quel type de service envisages-tu : lignes régulières ou transport à la demande ?"
-- "Le pressing, c'est un service très demandé. Tu cibles les particuliers, les entreprises, ou les deux ?"
-- "Un cyber café, besoin réel dans beaucoup de quartiers. Tu vises quel public : étudiants, professionnels, ou tout le monde ?"`;
+Bien, j'ai les éléments clés. Je te prépare le cahier de charge.`;
 
 // ==================== HANDLE CHAT ====================
 async function handleChat(res, message, history) {
@@ -162,18 +145,9 @@ Si tu as assez d'infos (8-12 échanges), commence par [GENERATE].`;
     });
 }
 
-// ==================== HANDLE GENERATE ====================
-async function handleGenerate(res, history) {
-    const conversationText = history.map(h => `${h.type === 'user' ? 'CLIENT' : 'CONSULTANT'}: ${h.content}`).join('\n\n');
-
-    const generatePrompt = `Tu es un expert en rédaction de cahiers de charge.
-
-CONVERSATION :
-═══════════════════════════════════════════════════════════════
-${conversationText}
-═══════════════════════════════════════════════════════════════
-
-Génère un CAHIER DE CHARGE professionnel basé sur cette conversation.
+// ==================== PROMPTS PAR TYPE DE DOCUMENT ====================
+const DOCUMENT_PROMPTS = {
+    cahier_charge: `Génère un CAHIER DE CHARGE professionnel.
 
 STRUCTURE :
 
@@ -183,14 +157,14 @@ STRUCTURE :
 ---
 
 ### 1. PRÉSENTATION DU PROJET
-**Description :** [2-3 phrases]
-**Objectif :** [1-2 phrases]
+Description : [2-3 phrases]
+Objectif : [1-2 phrases]
 
 ---
 
 ### 2. CIBLE & MARCHÉ
-**Clientèle visée :** [description]
-**Zone géographique :** [localisation]
+Clientèle visée : [description]
+Zone géographique : [localisation]
 
 ---
 
@@ -200,20 +174,20 @@ STRUCTURE :
 ---
 
 ### 4. FONCTIONNEMENT
-**Parcours client :** [étapes]
-**Moyens de paiement :** [options]
+Parcours client : [étapes]
+Moyens de paiement : [options]
 
 ---
 
 ### 5. ORGANISATION
-**Équipe :** [structure prévue]
-**Outils nécessaires :** [liste]
+Équipe : [structure prévue]
+Outils nécessaires : [liste]
 
 ---
 
 ### 6. BUDGET & PLANNING
-**Budget estimé :** [montant ou "À définir"]
-**Délai de lancement :** [date ou "À définir"]
+Budget estimé : [montant ou "À définir"]
+Délai de lancement : [date ou "À définir"]
 
 ---
 
@@ -222,14 +196,294 @@ STRUCTURE :
 
 ---
 
-*Document généré par Nzela - ARK Corporat Group*
-*${new Date().toLocaleDateString('fr-FR')}*
+Document généré par Nzela - ARK Corporat Group`,
+
+    budget: `Génère un BUDGET PRÉVISIONNEL professionnel.
+
+STRUCTURE :
+
+# BUDGET PRÉVISIONNEL
+## [Nom du projet]
+
+---
+
+### 1. INVESTISSEMENTS INITIAUX
+
+#### Équipements
+[Liste avec prix estimés en FCFA]
+
+#### Aménagements
+[Liste avec prix estimés]
+
+#### Frais administratifs
+[Licences, immatriculation, etc.]
+
+TOTAL INVESTISSEMENTS : [montant] FCFA
+
+---
+
+### 2. CHARGES MENSUELLES
+
+#### Charges fixes
+- Loyer : [montant] FCFA
+- Salaires : [montant] FCFA
+- Électricité/Eau : [montant] FCFA
+- Internet/Téléphone : [montant] FCFA
+- Autres : [montant] FCFA
+
+TOTAL CHARGES FIXES : [montant] FCFA/mois
+
+#### Charges variables
+[Liste avec estimations]
+
+---
+
+### 3. PRÉVISIONS DE REVENUS
+
+#### Hypothèse basse
+[Calcul détaillé]
+
+#### Hypothèse moyenne
+[Calcul détaillé]
+
+#### Hypothèse haute
+[Calcul détaillé]
+
+---
+
+### 4. POINT MORT
+Chiffre d'affaires minimum pour couvrir les charges : [montant] FCFA/mois
+
+---
+
+### 5. RECOMMANDATIONS FINANCIÈRES
+[2-3 conseils]
+
+---
+
+Document généré par Nzela - ARK Corporat Group`,
+
+    plan_projet: `Génère un PLAN DE PROJET professionnel.
+
+STRUCTURE :
+
+# PLAN DE PROJET
+## [Nom du projet]
+
+---
+
+### PHASE 1 : PRÉPARATION (Semaines 1-4)
+
+#### Semaine 1-2
+- [ ] [Tâche 1]
+- [ ] [Tâche 2]
+- [ ] [Tâche 3]
+
+#### Semaine 3-4
+- [ ] [Tâche 4]
+- [ ] [Tâche 5]
+
+Livrable : [ce qui doit être prêt]
+
+---
+
+### PHASE 2 : MISE EN PLACE (Semaines 5-8)
+
+#### Semaine 5-6
+- [ ] [Tâche]
+- [ ] [Tâche]
+
+#### Semaine 7-8
+- [ ] [Tâche]
+- [ ] [Tâche]
+
+Livrable : [ce qui doit être prêt]
+
+---
+
+### PHASE 3 : LANCEMENT (Semaines 9-10)
+
+- [ ] [Tâche]
+- [ ] [Tâche]
+- [ ] [Tâche]
+
+Livrable : Ouverture officielle
+
+---
+
+### PHASE 4 : SUIVI (Semaines 11-12)
+
+- [ ] [Tâche]
+- [ ] [Tâche]
+
+---
+
+### JALONS CLÉS
+
+| Jalon | Date | Responsable |
+|-------|------|-------------|
+| [Jalon 1] | Semaine X | [Qui] |
+| [Jalon 2] | Semaine X | [Qui] |
+| [Jalon 3] | Semaine X | [Qui] |
+
+---
+
+Document généré par Nzela - ARK Corporat Group`,
+
+    risques: `Génère une MATRICE DES RISQUES professionnelle.
+
+STRUCTURE :
+
+# MATRICE DES RISQUES
+## [Nom du projet]
+
+---
+
+### RISQUES ÉLEVÉS (Action immédiate requise)
+
+#### Risque 1 : [Nom du risque]
+- Probabilité : Élevée
+- Impact : Élevé
+- Description : [Détail]
+- Mitigation : [Comment réduire ce risque]
+- Plan B : [Si le risque se réalise]
+
+#### Risque 2 : [Nom du risque]
+[Même structure]
+
+---
+
+### RISQUES MOYENS (À surveiller)
+
+#### Risque 3 : [Nom du risque]
+- Probabilité : Moyenne
+- Impact : Moyen
+- Description : [Détail]
+- Mitigation : [Comment réduire]
+
+---
+
+### RISQUES FAIBLES (À noter)
+
+#### Risque 4 : [Nom du risque]
+- Probabilité : Faible
+- Impact : Faible
+- Description : [Détail]
+
+---
+
+### RISQUES SPÉCIFIQUES AU CONGO
+
+- [Risque local 1 : coupures électricité, etc.]
+- [Risque local 2]
+- [Risque local 3]
+
+---
+
+### PLAN DE CONTINGENCE GLOBAL
+[Recommandations générales pour gérer les imprévus]
+
+---
+
+Document généré par Nzela - ARK Corporat Group`,
+
+    checklist: `Génère une CHECKLIST DE LANCEMENT professionnelle.
+
+STRUCTURE :
+
+# CHECKLIST DE LANCEMENT
+## [Nom du projet]
+
+---
+
+### ADMINISTRATIF & JURIDIQUE
+- [ ] Immatriculation de l'entreprise
+- [ ] Numéro contribuable
+- [ ] Registre de commerce
+- [ ] Autorisation d'exercice (si nécessaire)
+- [ ] Contrat de bail signé
+- [ ] Assurance professionnelle
+- [ ] Compte bancaire professionnel
+
+---
+
+### LOCAL & ÉQUIPEMENTS
+- [ ] Local identifié et validé
+- [ ] Travaux d'aménagement terminés
+- [ ] Équipements achetés et installés
+- [ ] Connexion électrique OK
+- [ ] Connexion internet OK
+- [ ] Enseigne installée
+
+---
+
+### RESSOURCES HUMAINES
+- [ ] Postes définis
+- [ ] Recrutement effectué
+- [ ] Formation du personnel
+- [ ] Contrats de travail signés
+
+---
+
+### COMMERCIAL & MARKETING
+- [ ] Tarifs définis
+- [ ] Supports de communication prêts
+- [ ] Réseaux sociaux créés
+- [ ] Numéro WhatsApp Business
+- [ ] Premier stock / fournitures
+
+---
+
+### FINANCIER
+- [ ] Budget validé
+- [ ] Financement sécurisé
+- [ ] Système de paiement Mobile Money
+- [ ] Caisse / système de facturation
+
+---
+
+### JOUR J - OUVERTURE
+- [ ] Test général de tous les équipements
+- [ ] Équipe briefée
+- [ ] Stock vérifié
+- [ ] Communication de lancement envoyée
+- [ ] Premiers clients accueillis !
+
+---
+
+### APRÈS L'OUVERTURE (Semaine 1)
+- [ ] Collecter les retours clients
+- [ ] Ajuster si nécessaire
+- [ ] Suivi des ventes
+- [ ] Premier bilan
+
+---
+
+Document généré par Nzela - ARK Corporat Group`
+};
+
+// ==================== HANDLE GENERATE ====================
+async function handleGenerate(res, history, docType = 'cahier_charge') {
+    const conversationText = history.map(h => `${h.type === 'user' ? 'CLIENT' : 'CONSULTANT'}: ${h.content}`).join('\n\n');
+
+    const docPrompt = DOCUMENT_PROMPTS[docType] || DOCUMENT_PROMPTS.cahier_charge;
+
+    const generatePrompt = `Tu es un expert en gestion de projet.
+
+CONVERSATION AVEC LE CLIENT :
+═══════════════════════════════════════════════════════════════
+${conversationText}
+═══════════════════════════════════════════════════════════════
+
+MISSION :
+${docPrompt}
 
 RÈGLES :
 - Base-toi UNIQUEMENT sur la conversation
 - Si info manquante → "À définir"
 - Style clair et professionnel
-- Adapté au contexte Congo-Brazzaville (Mobile Money, FCFA)`;
+- Adapté au contexte Congo-Brazzaville (Mobile Money, FCFA)
+- Pas de blabla, que du concret`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
