@@ -1,3 +1,5 @@
+import { TEMPLATES, findTemplate } from './templates/index.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -51,7 +53,7 @@ const EXEMPLES = [
     "Je veux gérer mon supermarché"
 ];
 
-// Templates de sections fixes
+// Templates de sections fixes (utilisés si pas de template trouvé)
 const SECTIONS_CAHIER_CHARGE = [
     "Gestion des utilisateurs et clients",
     "Authentification et sécurité",
@@ -175,6 +177,23 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
 }
 
 async function handleForm(res, preoccupation, category) {
+    // 1. Chercher d'abord dans les templates
+    const found = findTemplate(preoccupation);
+    
+    if (found && found.template) {
+        const categoryKey = category === 'cahier_de_charge' ? 'cahier_de_charge' : 'structuration_projet';
+        const template = found.template[categoryKey];
+        
+        if (template) {
+            // Template trouvé → réponse instantanée !
+            console.log(`Template trouvé pour: ${found.projet}`);
+            return res.status(200).json({ form: template });
+        }
+    }
+    
+    // 2. Pas de template → génération par IA
+    console.log('Pas de template, génération par IA...');
+    
     const sections = category === 'cahier_de_charge' ? SECTIONS_CAHIER_CHARGE : SECTIONS_STRUCTURATION;
     const categoryLabel = category === 'cahier_de_charge' ? 'cahier de charge' : 'structuration de projet';
 
