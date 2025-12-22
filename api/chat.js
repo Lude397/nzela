@@ -1,5 +1,47 @@
-import { TEMPLATES, findTemplate } from './templates/index.js';
+// ==================== CONFIG SUPABASE ====================
+const SUPABASE_URL = 'https://kolwacpvfxdrptldipzj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvbHdhY3B2ZnhkcnB0bGRpcHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MjYzOTMsImV4cCI6MjA3NzQwMjM5M30.cXXOxBkX9KaddhfY5JoAvMGz-ohxdCoh5iQlHMUGHqE';
 
+// ==================== FONCTION RECHERCHE TEMPLATE ====================
+async function findTemplate(query, categorie) {
+    const q = query.toLowerCase();
+    
+    try {
+        // Recherche par mots-clés ou type_projet
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/templates?categorie=eq.${categorie}&select=*`,
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            }
+        );
+        
+        if (!response.ok) return null;
+        
+        const templates = await response.json();
+        
+        // Chercher le template correspondant
+        for (const template of templates) {
+            // Vérifier dans mots_cles
+            if (template.mots_cles && template.mots_cles.some(mot => q.includes(mot.toLowerCase()))) {
+                return template;
+            }
+            // Vérifier dans type_projet
+            if (q.includes(template.type_projet.toLowerCase())) {
+                return template;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erreur Supabase:', error);
+        return null;
+    }
+}
+
+// ==================== HANDLER ====================
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -10,12 +52,10 @@ export default async function handler(req, res) {
     try {
         const { mode, message, history, preoccupation, category } = req.body;
 
-        // MODE ANALYSE : Détecter si le message est une préoccupation claire
         if (mode === 'analyze') {
             return await handleAnalyze(res, message, history);
         }
         
-        // MODE FORMULAIRE : Générer le formulaire exhaustif
         if (mode === 'form') {
             return await handleForm(res, preoccupation, category);
         }
@@ -28,7 +68,7 @@ export default async function handler(req, res) {
     }
 }
 
-// Exemples aléatoires pour les demandes de clarification
+// ==================== CONSTANTES ====================
 const EXEMPLES = [
     "Je veux digitaliser mon pressing",
     "Je veux créer une app pour ma boutique",
@@ -39,21 +79,9 @@ const EXEMPLES = [
     "Je veux créer un hôtel",
     "Je veux lancer un garage auto",
     "Je veux digitaliser ma boutique de vêtements",
-    "Je veux gérer mon supermarché avec une app",
-    "Je veux créer un système pour ma quincaillerie",
-    "Je veux automatiser ma librairie",
-    "Je veux digitaliser ma boulangerie",
-    "Je veux créer une app pour mon bar",
-    "Je veux créer une clinique",
-    "Je veux gérer ma poissonnerie",
-    "Je veux gérer mon école avec un système",
-    "Je veux automatiser ma salle de sport",
-    "Je veux automatiser mon auberge",
-    "Je veux ouvrir une librairie",
-    "Je veux gérer mon supermarché"
+    "Je veux gérer mon supermarché avec une app"
 ];
 
-// Templates de sections fixes (utilisés si pas de template trouvé)
 const SECTIONS_CAHIER_CHARGE = [
     "Gestion des utilisateurs et clients",
     "Authentification et sécurité",
@@ -84,6 +112,7 @@ function getRandomExemple() {
     return EXEMPLES[Math.floor(Math.random() * EXEMPLES.length)];
 }
 
+// ==================== ANALYZE ====================
 async function handleAnalyze(res, message, history) {
     const systemPrompt = `Tu es Nzela, un assistant d'ARK Corporat Group au Congo-Brazzaville.
 Ta mission est de comprendre le message de l'utilisateur.
@@ -93,27 +122,27 @@ RÈGLES :
    - Réponds poliment et demande la préoccupation
    - action = "ask_clarification"
 
-2. Si le message est VAGUE ou INCOMPLET (ex: "je veux un truc", "j'ai besoin d'aide", "c'est pour un projet") :
+2. Si le message est VAGUE ou INCOMPLET :
    - Demande des éclaircissements avec un exemple concret
    - action = "ask_clarification"
 
-3. Si le message contient une PRÉOCCUPATION CLAIRE avec TYPE DE PROJET (restaurant, pressing, boutique, salon, école, etc.) :
+3. Si le message contient une PRÉOCCUPATION CLAIRE avec TYPE DE PROJET :
    
-   a) Si l'utilisateur PRÉCISE "cahier de charge", "cahier des charges", "application", "app", "système", "digitaliser" :
+   a) Si l'utilisateur PRÉCISE "cahier de charge", "application", "app", "système", "digitaliser" :
       - action = "confirm_choice"
       - detected_category = "cahier_de_charge"
-      - response = Une phrase pour confirmer, ex: "Tu veux un cahier de charge pour ton pressing, c'est bien ça ?"
+      - response = Une phrase pour confirmer
    
    b) Si l'utilisateur PRÉCISE "structuration", "structurer", "lancer", "ouvrir", "créer", "monter" (sans parler d'app) :
       - action = "confirm_choice"
       - detected_category = "structuration_projet"
-      - response = Une phrase pour confirmer, ex: "Tu veux structurer ton projet de restaurant, c'est bien ça ?"
+      - response = Une phrase pour confirmer
    
    c) Si l'utilisateur ne précise PAS ce qu'il veut :
       - action = "proceed"
       - Extrais la préoccupation reformulée
 
-4. Si l'utilisateur répond "oui", "ouais", "c'est ça", "exactement", "correct", "affirmatif", "yes", "ok" à une question de confirmation :
+4. Si l'utilisateur répond "oui", "ouais", "c'est ça", "exactement", "correct", "ok" :
    - action = "confirmed"
 
 EXEMPLE : "${getRandomExemple()}"
@@ -121,18 +150,12 @@ EXEMPLE : "${getRandomExemple()}"
 FORMAT JSON OBLIGATOIRE :
 {
     "action": "ask_clarification" | "proceed" | "confirm_choice" | "confirmed",
-    "response": "Ta réponse texte (si ask_clarification ou confirm_choice)",
-    "preoccupation": "La préoccupation extraite (si proceed ou confirm_choice)",
-    "detected_category": "cahier_de_charge" | "structuration_projet" (seulement si confirm_choice)
+    "response": "Ta réponse texte",
+    "preoccupation": "La préoccupation extraite",
+    "detected_category": "cahier_de_charge" | "structuration_projet"
 }
 
-STYLE :
-- Professionnel mais chaleureux
-- Pas d'emojis
-- Phrases courtes et simples
-- En français
-
-Historique de la conversation :
+Historique :
 ${history ? history.map(h => `${h.type === 'user' ? 'Utilisateur' : 'Nzela'}: ${h.content}`).join('\n') : 'Aucun'}
 
 Réponds UNIQUEMENT en JSON valide, sans backticks.`;
@@ -159,7 +182,6 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
     const data = await response.json();
     let aiResponse = data.choices[0].message.content.trim();
     
-    // Nettoyer la réponse
     if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
     else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
     if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
@@ -168,7 +190,6 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
         const parsed = JSON.parse(aiResponse.trim());
         return res.status(200).json(parsed);
     } catch {
-        // Fallback si le parsing échoue
         return res.status(200).json({ 
             action: 'ask_clarification', 
             response: 'Peux-tu me donner plus de détails sur ton projet ?' 
@@ -176,22 +197,22 @@ Réponds UNIQUEMENT en JSON valide, sans backticks.`;
     }
 }
 
+// ==================== FORM ====================
 async function handleForm(res, preoccupation, category) {
-    // 1. Chercher d'abord dans les templates
-    const found = findTemplate(preoccupation);
+    // 1. Chercher dans Supabase
+    const template = await findTemplate(preoccupation, category);
     
-    if (found && found.template) {
-        const categoryKey = category === 'cahier_de_charge' ? 'cahier_de_charge' : 'structuration_projet';
-        const template = found.template[categoryKey];
-        
-        if (template) {
-            // Template trouvé → réponse instantanée !
-            console.log(`Template trouvé pour: ${found.projet}`);
-            return res.status(200).json({ form: template });
-        }
+    if (template) {
+        console.log(`Template Supabase trouvé: ${template.type_projet}`);
+        return res.status(200).json({ 
+            form: {
+                titre: template.titre,
+                sections: template.sections
+            }
+        });
     }
     
-    // 2. Pas de template → génération par IA
+    // 2. Pas de template → IA génère
     console.log('Pas de template, génération par IA...');
     
     const sections = category === 'cahier_de_charge' ? SECTIONS_CAHIER_CHARGE : SECTIONS_STRUCTURATION;
@@ -202,38 +223,31 @@ async function handleForm(res, preoccupation, category) {
 MISSION :
 Génère les OPTIONS pour chaque section du ${categoryLabel} suivant : "${preoccupation}"
 
-SECTIONS IMPOSÉES (tu dois TOUTES les utiliser) :
+SECTIONS IMPOSÉES :
 ${sections.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
 RÈGLES :
-1. Utilise EXACTEMENT ces ${sections.length} sections, dans cet ordre
-2. Pour chaque section, génère 5 à 8 options SPÉCIFIQUES au projet "${preoccupation}"
-3. Chaque option a un nom et une définition courte (1-2 phrases)
-4. Adapte au contexte Congo-Brazzaville (Mobile Money, FCFA, réalités locales)
-5. Sois EXHAUSTIF et CRÉATIF pour chaque option
+1. Utilise EXACTEMENT ces ${sections.length} sections
+2. Pour chaque section, génère 5 à 8 options SPÉCIFIQUES
+3. Chaque option a un nom et une définition courte
+4. Adapte au contexte Congo-Brazzaville (Mobile Money, FCFA)
 
-FORMAT JSON OBLIGATOIRE :
+FORMAT JSON :
 {
     "form": {
         "titre": "Titre du projet",
         "sections": [
             {
-                "titre": "Nom de la section (utilise ceux imposés)",
+                "titre": "Nom de la section",
                 "options": [
-                    {
-                        "nom": "Nom de l'option",
-                        "definition": "Explication courte"
-                    }
+                    { "nom": "Nom", "definition": "Explication" }
                 ]
             }
         ]
     }
 }
 
-IMPORTANT :
-- JSON valide uniquement
-- Pas de backticks
-- Pas de texte avant/après`;
+JSON valide uniquement, pas de backticks.`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -245,7 +259,7 @@ IMPORTANT :
             model: 'deepseek-chat', 
             messages: [
                 { role: 'system', content: systemPrompt },
-                { role: 'user', content: `Génère le ${categoryLabel} complet pour : "${preoccupation}"` }
+                { role: 'user', content: `Génère le ${categoryLabel} pour : "${preoccupation}"` }
             ], 
             temperature: 0.7, 
             max_tokens: 4000 
@@ -257,7 +271,6 @@ IMPORTANT :
     const data = await response.json();
     let aiResponse = data.choices[0].message.content.trim();
     
-    // Nettoyer la réponse
     if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
     else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
     if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
