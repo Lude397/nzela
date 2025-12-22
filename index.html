@@ -59,10 +59,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             padding: 40px 24px;
-            padding-top: 15vh;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .welcome-screen.hidden {
@@ -142,14 +141,14 @@
         .welcome-send {
             position: absolute;
             bottom: 12px; right: 12px;
-            height: 36px;
-            padding: 0 14px;
+            height: 40px;
+            padding: 0 20px;
             background: linear-gradient(135deg, var(--accent) 0%, #b8956a 100%);
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--bg-primary);
             transition: all 0.2s ease;
@@ -960,8 +959,7 @@
         function handleWelcomeSend() {
             const message = elements.welcomeInput.value.trim();
             if (!message) return;
-
-            elements.welcomeInput.blur();
+            
             switchScreen('chat');
             addChatMessage('user', message);
             analyzeMessage(message);
@@ -977,7 +975,6 @@
             
             elements.chatInput.value = '';
             elements.chatSend.classList.remove('active');
-            elements.chatInput.blur();
             
             addChatMessage('user', message);
             analyzeMessage(message);
@@ -1114,6 +1111,26 @@
 
         async function generateForm() {
             try {
+                // 1. Vérifier si template existe
+                const checkResponse = await fetch(CONFIG.apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'check_template',
+                        preoccupation: state.preoccupation,
+                        category: state.category
+                    })
+                });
+                
+                const checkData = await checkResponse.json();
+                
+                // Si pas de template, afficher avertissement
+                if (!checkData.hasTemplate) {
+                    elements.loadingText.textContent = "Génération en cours (jusqu'à 2 min)...";
+                    elements.loadingText.style.fontSize = "14px";
+                }
+                
+                // 2. Générer le formulaire
                 const response = await fetch(CONFIG.apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
