@@ -200,6 +200,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            padding-bottom: 100px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -776,6 +777,11 @@
         }
 
         init();
+
+// Fix clavier mobile
+window.visualViewport?.addEventListener('resize', () => {
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+});
     </script>
 </body>
 </html>
