@@ -348,7 +348,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 28px 24px;
-            padding-bottom: 120px;
+            padding-bottom: 180px;
         }
 
         .document-body {
@@ -412,7 +412,12 @@
             max-width: 960px;
             margin: 0 auto;
             display: flex;
-            gap: 14px;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .document-actions-row {
+            display: flex;
+            gap: 12px;
         }
         .btn-action {
             flex: 1;
@@ -420,7 +425,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            padding: 18px 28px;
+            padding: 16px 24px;
             border: none;
             border-radius: var(--radius);
             font-family: inherit;
@@ -442,9 +447,92 @@
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
-        .btn-new {
+        .btn-other {
             background: var(--accent);
             color: var(--bg-primary);
+        }
+        .btn-new {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== MODAL CHOIX DOCUMENT ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+        .modal-overlay.visible {
+            display: flex;
+        }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-option:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+        }
+        .modal-option-icon {
+            font-size: 24px;
+        }
+        .modal-option-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .modal-close {
+            margin-top: 16px;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
         }
 
         /* ===== LOADING ===== */
@@ -491,7 +579,7 @@
             .message {
                 max-width: 90%;
             }
-            .document-actions-inner { 
+            .document-actions-row { 
                 flex-direction: column; 
             }
             .chat-messages {
@@ -500,7 +588,7 @@
             }
             .message-bubble {
                 padding: 14px 18px;
-                font-size: 15px;
+                font-size: 16px;
             }
         }
     </style>
@@ -541,7 +629,7 @@
         <!-- Écran loading -->
         <div class="loading-screen" id="loadingScreen">
             <div class="logo"><span>N</span></div>
-            <p class="loading-text">Je prépare ton cahier de charge...</p>
+            <p class="loading-text" id="loadingText">Je prépare ton document...</p>
         </div>
 
         <!-- Écran document -->
@@ -550,7 +638,7 @@
                 <div class="logo"><span>N</span></div>
                 <div class="document-header-info">
                     <div class="document-header-title">Ton document</div>
-                    <div class="document-header-badge">Cahier de charge</div>
+                    <div class="document-header-badge" id="documentBadge">Cahier de charge</div>
                 </div>
             </div>
             <div class="document-content">
@@ -558,16 +646,53 @@
             </div>
             <div class="document-actions">
                 <div class="document-actions-inner">
-                    <button class="btn-action btn-copy" onclick="copyDocument()">
-                        📋 Copier
-                    </button>
-                    <button class="btn-action btn-whatsapp" onclick="sendWhatsApp()">
-                        💬 WhatsApp
-                    </button>
-                    <button class="btn-action btn-new" onclick="newProject()">
-                        ✨ Nouveau
-                    </button>
+                    <div class="document-actions-row">
+                        <button class="btn-action btn-copy" onclick="copyDocument()">
+                            📋 Copier
+                        </button>
+                        <button class="btn-action btn-whatsapp" onclick="sendWhatsApp()">
+                            💬 WhatsApp
+                        </button>
+                    </div>
+                    <div class="document-actions-row">
+                        <button class="btn-action btn-other" onclick="showDocumentChoice()">
+                            📄 Autre document
+                        </button>
+                        <button class="btn-action btn-new" onclick="newProject()">
+                            ✨ Nouveau projet
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal choix document -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h3 class="modal-title">Quel document veux-tu ?</h3>
+                <div class="modal-options">
+                    <div class="modal-option" onclick="generateDocument('cahier_charge')">
+                        <span class="modal-option-icon">📋</span>
+                        <span class="modal-option-text">Cahier de charge</span>
+                    </div>
+                    <div class="modal-option" onclick="generateDocument('budget')">
+                        <span class="modal-option-icon">💰</span>
+                        <span class="modal-option-text">Budget prévisionnel</span>
+                    </div>
+                    <div class="modal-option" onclick="generateDocument('plan_projet')">
+                        <span class="modal-option-icon">📅</span>
+                        <span class="modal-option-text">Plan de projet</span>
+                    </div>
+                    <div class="modal-option" onclick="generateDocument('risques')">
+                        <span class="modal-option-icon">⚠️</span>
+                        <span class="modal-option-text">Matrice des risques</span>
+                    </div>
+                    <div class="modal-option" onclick="generateDocument('checklist')">
+                        <span class="modal-option-icon">✅</span>
+                        <span class="modal-option-text">Checklist de lancement</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="hideDocumentChoice()">Annuler</button>
             </div>
         </div>
     </div>
@@ -578,9 +703,18 @@
             whatsappNumber: '242064601399'
         };
 
+        const DOCUMENT_NAMES = {
+            'cahier_charge': 'Cahier de charge',
+            'budget': 'Budget prévisionnel',
+            'plan_projet': 'Plan de projet',
+            'risques': 'Matrice des risques',
+            'checklist': 'Checklist de lancement'
+        };
+
         const state = {
             chatHistory: [],
-            document: ''
+            currentDocument: '',
+            currentDocType: ''
         };
 
         const elements = {
@@ -592,8 +726,11 @@
             chatInput: document.getElementById('chatInput'),
             chatSend: document.getElementById('chatSend'),
             loadingScreen: document.getElementById('loadingScreen'),
+            loadingText: document.getElementById('loadingText'),
             documentScreen: document.getElementById('documentScreen'),
-            documentBody: document.getElementById('documentBody')
+            documentBody: document.getElementById('documentBody'),
+            documentBadge: document.getElementById('documentBadge'),
+            modalOverlay: document.getElementById('modalOverlay')
         };
 
         // ===== INITIALISATION =====
@@ -615,6 +752,11 @@
                 }
             });
             elements.chatSend.addEventListener('click', handleChatSend);
+
+            // Fermer modal en cliquant dehors
+            elements.modalOverlay.addEventListener('click', e => {
+                if (e.target === elements.modalOverlay) hideDocumentChoice();
+            });
         }
 
         // ===== WELCOME =====
@@ -710,8 +852,7 @@
                     addMessage('ai', data.response);
                     
                     setTimeout(() => {
-                        switchScreen('loading');
-                        generateDocument();
+                        generateDocument('cahier_charge');
                     }, 1500);
                 } else {
                     addMessage('ai', data.response);
@@ -724,13 +865,18 @@
             }
         }
 
-        async function generateDocument() {
+        async function generateDocument(docType) {
+            hideDocumentChoice();
+            elements.loadingText.textContent = `Je prépare ton ${DOCUMENT_NAMES[docType].toLowerCase()}...`;
+            switchScreen('loading');
+            
             try {
                 const response = await fetch(CONFIG.apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         mode: 'generate',
+                        docType: docType,
                         history: state.chatHistory
                     })
                 });
@@ -738,7 +884,9 @@
                 const data = await response.json();
                 
                 if (data.success && data.document) {
-                    state.document = data.document;
+                    state.currentDocument = data.document;
+                    state.currentDocType = docType;
+                    elements.documentBadge.textContent = DOCUMENT_NAMES[docType];
                     renderDocument(data.document);
                     switchScreen('document');
                 } else {
@@ -766,21 +914,48 @@
             elements.documentBody.innerHTML = html;
         }
 
-        // ===== ACTIONS DOCUMENT =====
+        // ===== FORMAT WHATSAPP =====
+        function formatForWhatsApp(text) {
+            return text
+                // Titres
+                .replace(/^# (.*$)/gm, '📋 *$1*')
+                .replace(/^## (.*$)/gm, '$1')
+                .replace(/^### \d+\. (.*$)/gm, '\n📌 *$1*')
+                .replace(/^### (.*$)/gm, '\n📌 *$1*')
+                .replace(/^#### (.*$)/gm, '*$1*')
+                // Nettoyage
+                .replace(/---/g, '')
+                .replace(/\*\*(.*?)\*\*/g, '*$1*')
+                // Supprimer lignes vides multiples
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        // ===== ACTIONS =====
         function copyDocument() {
-            navigator.clipboard.writeText(state.document).then(() => {
+            navigator.clipboard.writeText(state.currentDocument).then(() => {
                 alert('Document copié !');
             });
         }
 
         function sendWhatsApp() {
-            const text = encodeURIComponent(state.document);
+            const formatted = formatForWhatsApp(state.currentDocument);
+            const text = encodeURIComponent(formatted);
             window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${text}`, '_blank');
+        }
+
+        function showDocumentChoice() {
+            elements.modalOverlay.classList.add('visible');
+        }
+
+        function hideDocumentChoice() {
+            elements.modalOverlay.classList.remove('visible');
         }
 
         function newProject() {
             state.chatHistory = [];
-            state.document = '';
+            state.currentDocument = '';
+            state.currentDocType = '';
             elements.chatMessages.innerHTML = '';
             elements.welcomeInput.value = '';
             switchScreen('welcome');
