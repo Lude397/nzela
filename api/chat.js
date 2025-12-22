@@ -56,6 +56,10 @@ export default async function handler(req, res) {
             return await handleAnalyze(res, message, history);
         }
         
+        if (mode === 'check_template') {
+            return await handleCheckTemplate(res, preoccupation, category);
+        }
+        
         if (mode === 'form') {
             return await handleForm(res, preoccupation, category);
         }
@@ -112,53 +116,66 @@ function getRandomExemple() {
     return EXEMPLES[Math.floor(Math.random() * EXEMPLES.length)];
 }
 
+// ==================== CHECK TEMPLATE ====================
+async function handleCheckTemplate(res, preoccupation, category) {
+    const template = await findTemplate(preoccupation, category);
+    
+    if (template) {
+        return res.status(200).json({ 
+            hasTemplate: true,
+            message: null
+        });
+    } else {
+        return res.status(200).json({ 
+            hasTemplate: false,
+            message: "Ce projet n'est pas dans notre base. La génération peut prendre jusqu'à 2 minutes. Ne quittez pas et ne fermez pas la fenêtre."
+        });
+    }
+}
+
 // ==================== ANALYZE ====================
 async function handleAnalyze(res, message, history) {
     const systemPrompt = `Tu es Nzela, un assistant d'ARK Corporat Group au Congo-Brazzaville.
-Ta mission est de comprendre le message de l'utilisateur.
+Tu proposes 2 services : CAHIER DE CHARGE (pour digitaliser/créer une app) ou STRUCTURATION DE PROJET (pour lancer/ouvrir un business).
 
-RÈGLES :
-1. Si c'est une SALUTATION (bonjour, salut, hello, hi, coucou, bonsoir, etc.) :
-   - Réponds poliment et demande la préoccupation
-   - action = "ask_clarification"
+RÈGLES SIMPLES :
 
-2. Si le message est VAGUE ou INCOMPLET :
-   - Demande des éclaircissements avec un exemple concret
-   - action = "ask_clarification"
-
-3. Si le message contient une PRÉOCCUPATION CLAIRE avec TYPE DE PROJET :
+1. MESSAGE CLAIR (projet + type mentionné) :
+   Mots cahier de charge : "cahier de charge", "cahier des charges", "application", "app", "système", "digitaliser", "automatiser"
+   Mots structuration : "structurer", "lancer", "ouvrir", "créer", "monter", "démarrer" (SANS app/système)
    
-   a) Si l'utilisateur PRÉCISE "cahier de charge", "application", "app", "système", "digitaliser" :
-      - action = "confirm_choice"
-      - detected_category = "cahier_de_charge"
-      - response = Une phrase pour confirmer
-   
-   b) Si l'utilisateur PRÉCISE "structuration", "structurer", "lancer", "ouvrir", "créer", "monter" (sans parler d'app) :
-      - action = "confirm_choice"
-      - detected_category = "structuration_projet"
-      - response = Une phrase pour confirmer
-   
-   c) Si l'utilisateur ne précise PAS ce qu'il veut :
-      - action = "proceed"
-      - Extrais la préoccupation reformulée
+   → action = "confirm_choice"
+   → detected_category = "cahier_de_charge" ou "structuration_projet"
+   → preoccupation = le projet (pressing, restaurant, etc.)
+   → response = "Tu veux un [type] pour ton [projet], c'est bien ça ?"
 
-4. Si l'utilisateur répond "oui", "ouais", "c'est ça", "exactement", "correct", "ok" :
-   - action = "confirmed"
+2. PROJET DÉTECTÉ MAIS PAS LE TYPE :
+   → action = "proceed"
+   → preoccupation = le projet détecté
+   → response = null
+   (Le frontend affichera l'écran de choix)
 
-EXEMPLE : "${getRandomExemple()}"
+3. PROJET PAS CLAIR :
+   → action = "ask_clarification"
+   → response = "C'est quoi ton projet ?"
 
-FORMAT JSON OBLIGATOIRE :
-{
-    "action": "ask_clarification" | "proceed" | "confirm_choice" | "confirmed",
-    "response": "Ta réponse texte",
-    "preoccupation": "La préoccupation extraite",
-    "detected_category": "cahier_de_charge" | "structuration_projet"
-}
+4. CONFIRMATION (oui, ouais, ok, exactement, c'est ça, correct, yes, d'accord) :
+   → action = "confirmed"
+
+PRIORITÉ : "cahier de charge" > "structuration" si les deux sont présents.
 
 Historique :
 ${history ? history.map(h => `${h.type === 'user' ? 'Utilisateur' : 'Nzela'}: ${h.content}`).join('\n') : 'Aucun'}
 
-Réponds UNIQUEMENT en JSON valide, sans backticks.`;
+FORMAT JSON UNIQUEMENT :
+{
+    "action": "ask_clarification" | "proceed" | "confirm_choice" | "confirmed",
+    "response": "Ta réponse courte ou null",
+    "preoccupation": "Le projet ou null",
+    "detected_category": "cahier_de_charge" | "structuration_projet" | null
+}
+
+Réponds UNIQUEMENT avec le JSON, rien d'autre.`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
