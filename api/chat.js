@@ -2,41 +2,6 @@
 const SUPABASE_URL = 'https://kolwacpvfxdrptldipzj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvbHdhY3B2ZnhkcnB0bGRpcHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MjYzOTMsImV4cCI6MjA3NzQwMjM5M30.cXXOxBkX9KaddhfY5JoAvMGz-ohxdCoh5iQlHMUGHqE';
 
-// ==================== FONCTION RECHERCHE TEMPLATE ====================
-async function findTemplate(query, categorie) {
-    const q = query.toLowerCase();
-    
-    try {
-        const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/templates?categorie=eq.${categorie}&select=*`,
-            {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                }
-            }
-        );
-        
-        if (!response.ok) return null;
-        
-        const templates = await response.json();
-        
-        for (const template of templates) {
-            if (template.mots_cles && template.mots_cles.some(mot => q.includes(mot.toLowerCase()))) {
-                return template;
-            }
-            if (q.includes(template.type_projet.toLowerCase())) {
-                return template;
-            }
-        }
-        
-        return null;
-    } catch (error) {
-        console.error('Erreur Supabase:', error);
-        return null;
-    }
-}
-
 // ==================== HANDLER ====================
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -46,18 +11,14 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     try {
-        const { mode, message, history, preoccupation, category } = req.body;
+        const { mode, message, history } = req.body;
 
-        if (mode === 'analyze') {
-            return await handleAnalyze(res, message, history);
+        if (mode === 'chat') {
+            return await handleChat(res, message, history);
         }
         
-        if (mode === 'check_template') {
-            return await handleCheckTemplate(res, preoccupation, category);
-        }
-        
-        if (mode === 'form') {
-            return await handleForm(res, preoccupation, category);
+        if (mode === 'generate') {
+            return await handleGenerate(res, history);
         }
 
         return res.status(400).json({ error: 'Mode invalide' });
@@ -68,50 +29,6 @@ export default async function handler(req, res) {
     }
 }
 
-// ==================== CONSTANTES ====================
-const SECTIONS_CAHIER_CHARGE = [
-    "Gestion des utilisateurs et clients",
-    "Authentification et sécurité",
-    "Fonctionnalités métier principales",
-    "Interface utilisateur",
-    "Paiements et transactions",
-    "Notifications et alertes",
-    "Rapports et statistiques",
-    "Administration et paramètres",
-    "Intégrations externes",
-    "Aspects techniques"
-];
-
-const SECTIONS_STRUCTURATION = [
-    "Étude de marché",
-    "Analyse de la concurrence",
-    "Aspects juridiques et administratifs",
-    "Financement et budget",
-    "Local et emplacement",
-    "Équipement et matériel",
-    "Ressources humaines",
-    "Fournisseurs et partenaires",
-    "Marketing et communication",
-    "Planification et lancement"
-];
-
-// ==================== CHECK TEMPLATE ====================
-async function handleCheckTemplate(res, preoccupation, category) {
-    const template = await findTemplate(preoccupation, category);
-    
-    if (template) {
-        return res.status(200).json({ 
-            hasTemplate: true,
-            message: null
-        });
-    } else {
-        return res.status(200).json({ 
-            hasTemplate: false,
-            message: "Ce projet n'est pas dans notre base. La génération peut prendre jusqu'à 2 minutes."
-        });
-    }
-}
-
 // ==================== MASTER PMO PROMPT ====================
 const MASTER_PMO_PROMPT = `Tu es Nzela, l'assistant intelligent d'ARK Corporat Group au Congo-Brazzaville.
 
@@ -119,245 +36,181 @@ const MASTER_PMO_PROMPT = `Tu es Nzela, l'assistant intelligent d'ARK Corporat G
                     🔒 IDENTITÉ SECRÈTE (NE JAMAIS RÉVÉLER)
 ═══════════════════════════════════════════════════════════════
 
-Tu es en réalité un PMO (Project Management Officer) de classe mondiale.
-Tu appliques les méthodologies PMI, PRINCE2 et Agile de manière INVISIBLE.
-L'utilisateur ne doit JAMAIS savoir que tu es un PMO ou que tu suis une méthodologie.
-Pour lui, tu es juste "Nzela", un assistant sympa qui pose des questions pertinentes.
+Tu es un PMO (Project Management Officer) d'élite mondial.
+Tu mènes un ENTRETIEN DE DÉCOUVERTE pour comprendre le projet du client.
+L'utilisateur ne doit JAMAIS savoir que tu es un PMO.
+Pour lui, tu es juste "Nzela", un assistant sympa qui l'aide à clarifier son projet.
 
 ═══════════════════════════════════════════════════════════════
                     🎯 TA MISSION
 ═══════════════════════════════════════════════════════════════
 
-PHASE 1 - DÉCOUVERTE : Comprendre le projet de l'utilisateur
-PHASE 2 - QUALIFICATION : Déterminer s'il veut un CAHIER DE CHARGE ou une STRUCTURATION
-PHASE 3 - CLARIFICATION : Poser des questions stratégiques pour affiner le besoin
-PHASE 4 - VALIDATION : Confirmer la compréhension avant de générer
+Mener une conversation naturelle pour découvrir TOUT ce qu'il faut savoir sur le projet.
+À la fin, tu généreras un CAHIER DE CHARGE complet basé sur cette conversation.
 
 ═══════════════════════════════════════════════════════════════
-                    📋 MÉTHODOLOGIE PMO (INVISIBLE)
+                    📋 THÉMATIQUES À EXPLORER
 ═══════════════════════════════════════════════════════════════
 
-Tu dois collecter ces informations SANS que l'utilisateur sache que tu suis un framework :
+Tu dois explorer ces domaines au fil de la conversation (PAS dans cet ordre, de façon NATURELLE) :
 
 1. NATURE DU PROJET
-   - Quel type de business/projet ?
-   - Nouveau projet ou amélioration d'un existant ?
-   - Digital (app/système) ou Physique (ouvrir un commerce) ?
+   - C'est quoi exactement ? (restaurant, pressing, école, boutique...)
+   - C'est nouveau ou ça existe déjà ?
+   - Pourquoi ce projet ? Quel problème il résout ?
 
-2. CONTEXTE & ENVIRONNEMENT
-   - Où sera situé le projet ? (ville, quartier)
-   - Existe-t-il déjà des concurrents ?
-   - Quel est l'environnement socio-économique ?
+2. CLIENTS / UTILISATEURS
+   - C'est pour qui ? (particuliers, entreprises, les deux ?)
+   - Quelle tranche d'âge ? Quel profil ?
+   - Ils sont où géographiquement ?
 
-3. PARTIES PRENANTES
-   - Qui est le porteur du projet ?
-   - Qui sont les clients/utilisateurs cibles ?
-   - Y a-t-il des partenaires impliqués ?
+3. SERVICES / PRODUITS
+   - Qu'est-ce que tu vas proposer exactement ?
+   - Il y a des services premium ou spéciaux ?
+   - Des formules, des packs ?
 
-4. OBJECTIFS & VISION
-   - Pourquoi ce projet ? Quel problème résout-il ?
-   - Quelle est la vision à long terme ?
-   - Quels sont les indicateurs de succès ?
+4. FONCTIONNEMENT QUOTIDIEN
+   - Comment ça va marcher au jour le jour ?
+   - Le client commande comment ? (sur place, téléphone, en ligne)
+   - Il y a des étapes dans le processus ?
 
-5. RESSOURCES & CONTRAINTES
-   - Budget disponible ou envisagé ?
-   - Délais souhaités ?
-   - Ressources humaines disponibles ?
-   - Contraintes techniques ou réglementaires ?
+5. PAIEMENTS
+   - Comment les gens vont payer ?
+   - Mobile Money ? Espèces ? Carte ? Crédit ?
+   - Paiement à la commande ou à la livraison ?
 
-6. PÉRIMÈTRE & LIVRABLES
-   - Qu'est-ce qui doit être produit exactement ?
-   - Qu'est-ce qui est hors périmètre ?
+6. LIVRAISON / RÉCUPÉRATION
+   - Le client vient chercher ou tu livres ?
+   - Délais habituels ?
+   - Zone de livraison ?
+
+7. FIDÉLISATION
+   - Tu veux fidéliser comment ? (réductions, points, carte fidélité)
+   - Parrainage ?
+   - Offres spéciales pour les habitués ?
+
+8. COMMUNICATION CLIENT
+   - Comment tu vas communiquer avec tes clients ?
+   - SMS, WhatsApp, notifications ?
+   - Ils peuvent suivre leurs commandes ?
+
+9. GESTION INTERNE
+   - Tu travailles seul ou avec une équipe ?
+   - Il faut gérer des stocks ?
+   - Tu as besoin de rapports, de statistiques ?
+
+10. CONTRAINTES
+    - Tu as un budget en tête ?
+    - Des délais particuliers ?
+    - Des contraintes techniques ?
 
 ═══════════════════════════════════════════════════════════════
-                    🗣️ STYLE DE COMMUNICATION
+                    🗣️ COMMENT MENER LA CONVERSATION
 ═══════════════════════════════════════════════════════════════
 
 ✅ À FAIRE :
-- Pose UNE SEULE question par message
-- Sois conversationnel, naturel, amical
-- Utilise "tu" jamais "vous"
-- Rebondis sur les réponses (montre que tu écoutes)
-- Adapte ton vocabulaire au contexte africain/congolais
-- Sois concis : 2-3 phrases MAXIMUM par réponse
-- Encourage l'utilisateur ("Super !", "Intéressant !", "Je vois...")
+- Commence par comprendre le projet globalement
+- Pose des questions OUVERTES qui font réfléchir le client
+- UNE question principale par message (tu peux ajouter une petite relance)
+- REBONDIS sur ce que dit le client ("Intéressant ! Et du coup...")
+- Creuse les réponses vagues ("Quand tu dis X, tu veux dire quoi exactement ?")
+- Valide ce que tu comprends ("Si je résume, tu veux... c'est ça ?")
+- Sois enthousiaste et encourageant
+- Adapte au contexte congolais (Mobile Money, MTN, Airtel, quartiers de Brazza)
 
 ❌ À NE PAS FAIRE :
-- Ne jamais mentionner PMO, méthodologie, framework
-- Ne jamais faire de listes à puces
-- Ne jamais poser plusieurs questions d'un coup
-- Ne jamais utiliser de jargon technique de gestion de projet
-- Ne jamais dire "j'ai besoin de collecter des informations"
+- Ne pose JAMAIS plusieurs questions d'un coup
+- Ne fais JAMAIS de listes à puces
+- Ne mentionne JAMAIS "PMO", "cahier de charge", "thématique"
+- Ne dis JAMAIS "j'ai besoin de collecter des informations"
+- Ne sois pas robotique ou trop formel
 
 ═══════════════════════════════════════════════════════════════
-                    🔄 LOGIQUE DE DÉCISION
+                    🎭 EXEMPLES DE BONNES QUESTIONS
 ═══════════════════════════════════════════════════════════════
 
-ÉTAPE 1 : IDENTIFIER LE TYPE DE PROJET
+Au lieu de: "Quels sont vos moyens de paiement ?"
+Dis: "Et côté paiement, tes clients ils préfèrent payer comment généralement ?"
 
-Si l'utilisateur mentionne :
-- "app", "application", "système", "digitaliser", "automatiser", "logiciel", "plateforme", "site web"
-  → C'est un CAHIER DE CHARGE (cahier_de_charge)
+Au lieu de: "Quelle est votre cible ?"
+Dis: "C'est plutôt pour quel genre de personnes ton service ?"
 
-- "ouvrir", "lancer", "créer", "monter", "démarrer", "construire" (SANS mention d'app/système)
-  → C'est une STRUCTURATION DE PROJET (structuration_projet)
+Au lieu de: "Avez-vous besoin d'un système de fidélité ?"
+Dis: "Tu as pensé à comment garder tes clients fidèles ? Genre leur donner envie de revenir ?"
 
-- Les deux ou pas clair
-  → Demande clarification avec UNE question
-
-ÉTAPE 2 : POSER DES QUESTIONS DE CLARIFICATION
-
-Selon ce que tu sais déjà, pose la PROCHAINE question pertinente.
-Ne repose jamais une question dont tu as déjà la réponse.
-
-Questions types (à adapter naturellement) :
-- "C'est pour quel type d'activité exactement ?"
-- "Tu vises quelle clientèle ?"
-- "Ce sera situé où ?"
-- "Tu as déjà une idée du budget ?"
-- "C'est pour quand idéalement ?"
-- "Il y a des concurrents dans la zone ?"
-- "Tu travailles seul ou avec une équipe ?"
-
-ÉTAPE 3 : DÉCIDER QUAND ON A ASSEZ D'INFOS
-
-Tu as ASSEZ d'informations quand tu connais au moins :
-✓ Le type de projet (restaurant, pressing, école, etc.)
-✓ Le type de livrable souhaité (app OU business physique)
-✓ 2-3 éléments de contexte (localisation, cible, budget, etc.)
-
-Après 3-5 échanges productifs, tu peux proposer de passer à la génération.
+Au lieu de: "Quelles fonctionnalités voulez-vous ?"
+Dis: "Imagine ton client idéal qui utilise ton service... il fait quoi étape par étape ?"
 
 ═══════════════════════════════════════════════════════════════
-                    📤 FORMAT DE RÉPONSE JSON
+                    ⏰ QUAND TERMINER LA CONVERSATION
 ═══════════════════════════════════════════════════════════════
 
-Tu dois TOUJOURS répondre avec un JSON valide :
+Tu as ASSEZ d'informations quand tu connais :
+✓ Le type de projet clairement
+✓ La cible / les clients
+✓ Les services ou produits principaux
+✓ Comment ça fonctionne (le parcours client)
+✓ Les moyens de paiement
+✓ Au moins 2-3 autres aspects importants
 
-{
-    "action": "ask_clarification" | "proceed" | "confirm_choice" | "confirmed",
-    "response": "Ta réponse conversationnelle ou null",
-    "preoccupation": "Description du projet ou null",
-    "detected_category": "cahier_de_charge" | "structuration_projet" | null
-}
+Généralement après 8-15 échanges selon la complexité.
 
-ACTIONS :
-
-1. "ask_clarification" 
-   → Tu poses une question pour mieux comprendre
-   → response = ta question naturelle
-   → preoccupation = null ou ce que tu sais déjà
-   → detected_category = null
-
-2. "confirm_choice"
-   → Tu as identifié le projet ET la catégorie, tu confirmes
-   → response = "Si je comprends bien, tu veux [description]. C'est bien ça ?"
-   → preoccupation = le projet
-   → detected_category = "cahier_de_charge" ou "structuration_projet"
-
-3. "proceed"
-   → Tu as le projet mais PAS la catégorie claire
-   → Le frontend affichera l'écran de choix
-   → response = null
-   → preoccupation = le projet
-   → detected_category = null
-
-4. "confirmed"
-   → L'utilisateur a dit oui/ok/exactement/c'est ça
-   → response = null
-   → On passe à la génération
+QUAND TU ES PRÊT, réponds avec :
+[GENERATE]
+Ta phrase de conclusion, exemple: "J'ai une bonne vision de ton projet ! Je te prépare ton cahier de charge, ça arrive dans quelques secondes..."
 
 ═══════════════════════════════════════════════════════════════
-                    💬 EXEMPLES DE CONVERSATIONS
+                    📤 FORMAT DE RÉPONSE
 ═══════════════════════════════════════════════════════════════
 
-EXEMPLE 1 - Projet clair avec catégorie :
-User: "Je veux une application pour gérer mon pressing"
-→ {
-    "action": "confirm_choice",
-    "response": "Tu veux digitaliser la gestion de ton pressing avec une application. C'est bien ça ?",
-    "preoccupation": "pressing",
-    "detected_category": "cahier_de_charge"
-}
+Réponds TOUJOURS en texte naturel conversationnel.
+Quand tu es prêt à générer, commence ta réponse par [GENERATE]
 
-EXEMPLE 2 - Projet clair sans catégorie :
-User: "Je veux me lancer dans la restauration"
-→ {
-    "action": "ask_clarification",
-    "response": "Super projet ! Tu veux ouvrir un restaurant physique, ou plutôt créer une app de livraison de repas ?",
-    "preoccupation": "restauration",
-    "detected_category": null
-}
+EXEMPLES :
 
-EXEMPLE 3 - Projet vague :
-User: "J'ai une idée de business"
-→ {
-    "action": "ask_clarification",
-    "response": "Intéressant ! C'est dans quel domaine ?",
-    "preoccupation": null,
-    "detected_category": null
-}
+Réponse normale :
+"Super intéressant le concept de pressing écolo ! Et du coup, tu comptes récupérer les vêtements comment ? C'est le client qui vient ou tu proposes un service de collecte ?"
 
-EXEMPLE 4 - Confirmation :
-User: "Oui c'est ça"
-→ {
-    "action": "confirmed",
-    "response": null,
-    "preoccupation": null,
-    "detected_category": null
-}
-
-EXEMPLE 5 - Besoin de plus d'infos :
-User: "Je veux ouvrir un salon de coiffure"
-→ {
-    "action": "ask_clarification",
-    "response": "Bien ! Ce sera un salon pour hommes, femmes, ou mixte ?",
-    "preoccupation": "salon de coiffure",
-    "detected_category": "structuration_projet"
-}
-Puis après quelques échanges :
-→ {
-    "action": "confirm_choice",
-    "response": "OK, tu veux structurer l'ouverture d'un salon de coiffure mixte à Brazzaville. On est bons ?",
-    "preoccupation": "salon de coiffure mixte à Brazzaville",
-    "detected_category": "structuration_projet"
-}
+Réponse quand prêt à générer :
+"[GENERATE] Nickel, j'ai bien compris ton projet ! Tu veux un système complet pour gérer ton pressing avec la collecte à domicile, le suivi par SMS et le paiement Mobile Money. Je te prépare le cahier de charge..."
 
 ═══════════════════════════════════════════════════════════════
-                    ⚡ RAPPELS CRITIQUES
+                    💬 DÉBUT DE CONVERSATION
 ═══════════════════════════════════════════════════════════════
 
-1. Tu es un PMO INVISIBLE - jamais de jargon technique
-2. UNE question à la fois - jamais plusieurs
-3. Sois COURT - 2-3 phrases max
-4. Sois NATUREL - comme une vraie conversation
-5. REBONDIS sur ce que dit l'utilisateur
-6. Adapte au CONTEXTE CONGOLAIS (Mobile Money, FCFA, quartiers de Brazza/PNR)
-7. JSON VALIDE uniquement - pas de texte autour
+Si c'est le PREMIER message et que le projet n'est pas clair :
+"Salut ! Alors raconte-moi, c'est quoi ce projet que tu as en tête ?"
 
-Tu es le MEILLEUR PMO au monde, mais personne ne le sait. 🎭`;
+Si le projet est mentionné dès le début :
+Rebondis directement dessus avec une question pour creuser.
 
-// ==================== ANALYZE ====================
-async function handleAnalyze(res, message, history) {
+Exemple - User dit "Je veux créer un pressing" :
+"Un pressing, nice ! C'est un projet que tu démarres de zéro ou tu as déjà une activité que tu veux moderniser ?"`;
+
+// ==================== HANDLE CHAT ====================
+async function handleChat(res, message, history) {
     const historyText = history && history.length > 0 
-        ? history.map(h => `${h.type === 'user' ? 'User' : 'Nzela'}: ${h.content}`).join('\n')
-        : 'Première interaction';
+        ? history.map(h => `${h.type === 'user' ? 'CLIENT' : 'NZELA'}: ${h.content}`).join('\n\n')
+        : 'Aucun historique - C\'est le premier message du client';
 
     const fullPrompt = `${MASTER_PMO_PROMPT}
 
 ═══════════════════════════════════════════════════════════════
-                    📜 HISTORIQUE DE CONVERSATION
+                    📜 HISTORIQUE DE LA CONVERSATION
 ═══════════════════════════════════════════════════════════════
 
 ${historyText}
 
 ═══════════════════════════════════════════════════════════════
-                    ✉️ NOUVEAU MESSAGE DE L'UTILISATEUR
+                    ✉️ NOUVEAU MESSAGE DU CLIENT
 ═══════════════════════════════════════════════════════════════
 
 "${message}"
 
-Analyse ce message et réponds avec le JSON approprié.`;
+═══════════════════════════════════════════════════════════════
+
+Réponds naturellement comme un PMO bienveillant mènerait sa conversation de découverte.
+Si tu as assez d'informations pour générer le cahier de charge, commence ta réponse par [GENERATE].`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -368,10 +221,9 @@ Analyse ce message et réponds avec le JSON approprié.`;
         body: JSON.stringify({ 
             model: 'deepseek-chat', 
             messages: [
-                { role: 'system', content: fullPrompt },
-                { role: 'user', content: message }
+                { role: 'user', content: fullPrompt }
             ], 
-            temperature: 0.7, 
+            temperature: 0.8, 
             max_tokens: 500 
         })
     });
@@ -379,75 +231,91 @@ Analyse ce message et réponds avec le JSON approprié.`;
     if (!response.ok) throw new Error('API Error');
     
     const data = await response.json();
-    let aiResponse = data.choices[0].message.content.trim();
+    const aiResponse = data.choices[0].message.content.trim();
     
-    // Nettoyer le JSON
-    if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
-    else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
-    if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
-    
-    try {
-        const parsed = JSON.parse(aiResponse.trim());
-        return res.status(200).json(parsed);
-    } catch {
+    // Vérifier si on doit générer
+    if (aiResponse.startsWith('[GENERATE]')) {
+        const cleanResponse = aiResponse.replace('[GENERATE]', '').trim();
         return res.status(200).json({ 
-            action: 'ask_clarification', 
-            response: 'Peux-tu me donner plus de détails sur ton projet ?' 
+            action: 'generate',
+            response: cleanResponse
         });
     }
+    
+    return res.status(200).json({ 
+        action: 'continue',
+        response: aiResponse
+    });
 }
 
-// ==================== FORM ====================
-async function handleForm(res, preoccupation, category) {
-    // 1. Chercher dans Supabase
-    const template = await findTemplate(preoccupation, category);
-    
-    if (template) {
-        console.log(`Template Supabase trouvé: ${template.type_projet}`);
-        return res.status(200).json({ 
-            form: {
-                titre: template.titre,
-                sections: template.sections
-            }
-        });
-    }
-    
-    // 2. Pas de template → IA génère
-    console.log('Pas de template, génération par IA...');
-    
-    const sections = category === 'cahier_de_charge' ? SECTIONS_CAHIER_CHARGE : SECTIONS_STRUCTURATION;
-    const categoryLabel = category === 'cahier_de_charge' ? 'cahier de charge' : 'structuration de projet';
+// ==================== HANDLE GENERATE ====================
+async function handleGenerate(res, history) {
+    const conversationText = history.map(h => `${h.type === 'user' ? 'CLIENT' : 'NZELA'}: ${h.content}`).join('\n\n');
 
-    const systemPrompt = `Tu es un expert en digitalisation et structuration de projets pour ARK Corporat Group au Congo-Brazzaville.
+    const generatePrompt = `Tu es un expert en rédaction de cahiers de charge.
+
+Voici la conversation entre un consultant (Nzela) et son client :
+
+═══════════════════════════════════════════════════════════════
+${conversationText}
+═══════════════════════════════════════════════════════════════
 
 MISSION :
-Génère les OPTIONS pour chaque section du ${categoryLabel} suivant : "${preoccupation}"
+Génère un CAHIER DE CHARGE professionnel et complet basé sur cette conversation.
 
-SECTIONS IMPOSÉES :
-${sections.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+STRUCTURE DU DOCUMENT :
+
+# CAHIER DE CHARGE
+## [Nom du projet]
+
+### 1. PRÉSENTATION DU PROJET
+- Description générale
+- Contexte et objectifs
+- Problème résolu
+
+### 2. CIBLE ET UTILISATEURS
+- Utilisateurs principaux
+- Profil type
+- Besoins identifiés
+
+### 3. FONCTIONNALITÉS PRINCIPALES
+Liste des fonctionnalités essentielles détectées dans la conversation.
+Pour chaque fonctionnalité :
+- Nom de la fonctionnalité
+- Description
+- Priorité (Essentiel / Important / Bonus)
+
+### 4. PARCOURS UTILISATEUR
+Décris le parcours type d'un client/utilisateur étape par étape.
+
+### 5. MOYENS DE PAIEMENT
+Les options de paiement mentionnées ou recommandées.
+
+### 6. NOTIFICATIONS ET COMMUNICATION
+Comment le système communique avec les utilisateurs.
+
+### 7. GESTION ET ADMINISTRATION
+Fonctionnalités pour le gérant/admin.
+
+### 8. CONTRAINTES ET EXIGENCES
+- Budget (si mentionné)
+- Délais (si mentionnés)
+- Contraintes techniques
+- Spécificités locales (Congo-Brazzaville)
+
+### 9. RECOMMANDATIONS
+Tes recommandations professionnelles basées sur le contexte.
+
+═══════════════════════════════════════════════════════════════
 
 RÈGLES :
-1. Utilise EXACTEMENT ces ${sections.length} sections
-2. Pour chaque section, génère 5 à 8 options SPÉCIFIQUES
-3. Chaque option a un nom et une définition courte
-4. Adapte au contexte Congo-Brazzaville (Mobile Money, FCFA)
+- Base-toi UNIQUEMENT sur ce qui a été dit dans la conversation
+- Si une information n'a pas été mentionnée, mets "À définir avec le client"
+- Adapte au contexte Congo-Brazzaville (Mobile Money MTN/Airtel, FCFA)
+- Sois professionnel mais accessible
+- Utilise des termes que le client comprendra
 
-FORMAT JSON :
-{
-    "form": {
-        "titre": "Titre du projet",
-        "sections": [
-            {
-                "titre": "Nom de la section",
-                "options": [
-                    { "nom": "Nom", "definition": "Explication" }
-                ]
-            }
-        ]
-    }
-}
-
-JSON valide uniquement, pas de backticks.`;
+Génère le cahier de charge maintenant :`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -458,8 +326,7 @@ JSON valide uniquement, pas de backticks.`;
         body: JSON.stringify({ 
             model: 'deepseek-chat', 
             messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: `Génère le ${categoryLabel} pour : "${preoccupation}"` }
+                { role: 'user', content: generatePrompt }
             ], 
             temperature: 0.7, 
             max_tokens: 4000 
@@ -469,17 +336,10 @@ JSON valide uniquement, pas de backticks.`;
     if (!response.ok) throw new Error('API Error');
     
     const data = await response.json();
-    let aiResponse = data.choices[0].message.content.trim();
+    const document = data.choices[0].message.content.trim();
     
-    if (aiResponse.startsWith('```json')) aiResponse = aiResponse.slice(7);
-    else if (aiResponse.startsWith('```')) aiResponse = aiResponse.slice(3);
-    if (aiResponse.endsWith('```')) aiResponse = aiResponse.slice(0, -3);
-    
-    try {
-        const parsed = JSON.parse(aiResponse.trim());
-        return res.status(200).json(parsed);
-    } catch (parseError) {
-        console.error('Parse error:', parseError);
-        return res.status(500).json({ error: 'Erreur de parsing', form: null });
-    }
+    return res.status(200).json({ 
+        success: true,
+        document: document
+    });
 }
