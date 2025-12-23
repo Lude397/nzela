@@ -1258,17 +1258,36 @@
         }
 
         function renderDocument(text) {
-            let html = text
-                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/^\- (.*$)/gm, '• $1')
-                .replace(/\n/g, '<br>');
+    // Convertir les tableaux Markdown
+    text = text.replace(/\|(.+)\|\n\|[-:| ]+\|\n([\s\S]*?)(?=\n\n|\n#|$)/gm, function(match, header, body) {
+        const headers = header.split('|').filter(h => h.trim());
+        const rows = body.trim().split('\n');
+        
+        let table = '<table style="width:100%; border-collapse:collapse; margin:20px 0;">';
+        table += '<tr>' + headers.map(h => '<th style="border:1px solid #2a2a2a; padding:12px; background:#1a1a1a; color:#d4a574; text-align:left;">' + h.trim() + '</th>').join('') + '</tr>';
+        
+        rows.forEach(row => {
+            const cells = row.split('|').filter(c => c.trim());
+            if (cells.length > 0) {
+                table += '<tr>' + cells.map(c => '<td style="border:1px solid #2a2a2a; padding:12px; color:#a0a0a0;">' + c.trim() + '</td>').join('') + '</tr>';
+            }
+        });
+        
+        table += '</table>';
+        return table;
+    });
 
-            elements.documentBody.innerHTML = html;
-        }
+    let html = text
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\- (.*$)/gm, '• $1')
+        .replace(/\n/g, '<br>');
+
+    elements.documentBody.innerHTML = html;
+}
 
         // ===== FORMAT WHATSAPP =====
         function formatForWhatsApp(text) {
