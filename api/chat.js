@@ -109,12 +109,23 @@ STRUCTURE OBLIGATOIRE :
 3. Questions guidées avec options (jusqu'à 6 questions)
 
 FORMAT :
-"Noté : [synthèse courte].
+"[résumé du projet décrit par le client].
 
-Passons à [thème]. 
-[Questions avec options A/B/C/D + demande de précision]"
+Commençons par le contexte. Quel est le déclencheur de ce projet ?
 
-IMPORTANT : Chaque option A/B/C/D/E doit être sur une NOUVELLE LIGNE.
+A) Un problème opérationnel récurrent à résoudre
+B) Une opportunité de marché identifiée
+C) Une sollicitation externe (client, partenaire, institution)
+D) Une exigence réglementaire ou de conformité
+E) Autre contexte (précise en 2 phrases)
+
+Et pourquoi maintenant ? Qu'est-ce qui crée l'urgence ?"
+
+FORMAT OBLIGATOIRE POUR LES OPTIONS :
+- Ligne vide avant la liste d'options
+- Chaque option A) B) C) D) E) F) sur sa propre ligne
+- Ligne vide après la liste d'options
+- JAMAIS tout sur une seule ligne
 
 ═══════════════════════════════════════════════════════════════
                     💡 EXEMPLES
