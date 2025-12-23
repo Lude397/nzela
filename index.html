@@ -1157,12 +1157,14 @@
         
             // Retour à la ligne avant chaque option A) B) C) D) E) F)
             let html = div.innerHTML;
+            console.log('AVANT:', html);
             html = html.split(' A)').join('<br><br>A)');
             html = html.split(' B)').join('<br><br>B)');
             html = html.split(' C)').join('<br><br>C)');
             html = html.split(' D)').join('<br><br>D)');
             html = html.split(' E)').join('<br><br>E)');
             html = html.split(' F)').join('<br><br>F)');
+            console.log('APRÈS:', html);
             
             return div.innerHTML;
         }
