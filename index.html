@@ -1152,22 +1152,17 @@
         }
 
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-        
-            // Retour à la ligne avant chaque option A) B) C) D) E) F)
-            let html = div.innerHTML;
-            console.log('AVANT:', html);
-            html = html.split('\n').join('<br>');  // AJOUTER EN PREMIER
-            html = html.split(' A)').join('<br><br>A)');
-            html = html.split(' B)').join('<br><br>B)');
-            html = html.split(' C)').join('<br><br>C)');
-            html = html.split(' D)').join('<br><br>D)');
-            html = html.split(' E)').join('<br><br>E)');
-            html = html.split(' F)').join('<br><br>F)');
-            console.log('APRÈS:', html);
-            
-            return div.innerHTML;
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>')
+        .split(' A)').join('<br><br>A)')
+        .split(' B)').join('<br><br>B)')
+        .split(' C)').join('<br><br>C)')
+        .split(' D)').join('<br><br>D)')
+        .split(' E)').join('<br><br>E)')
+        .split(' F)').join('<br><br>F)');
         }
 
         function scrollToBottom() {
