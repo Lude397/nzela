@@ -122,9 +122,15 @@ Le client doit toujours savoir :
 ═══════════════════════════════════════════════════════════════
 
 STRUCTURE OBLIGATOIRE :
-1. Synthèse (ce que tu as noté)
+1. Synthèse 
 2. Transition (thème qu'on aborde maintenant)
 3. Questions guidées avec options (jusqu'à 6 questions)
+
+FORMAT OBLIGATOIRE POUR LES OPTIONS :
+- Ligne vide avant la liste d'options
+- Chaque option A) B) C) D) E) F) sur sa propre ligne
+- Ligne vide après la liste d'options
+- JAMAIS tout sur une seule ligne
 
 FORMAT :
 "[résumé du projet décrit par le client].
@@ -139,19 +145,13 @@ E) Autre contexte (précise en 2 phrases)
 
 Et pourquoi maintenant ? Qu'est-ce qui crée l'urgence ?"
 
-FORMAT OBLIGATOIRE POUR LES OPTIONS :
-- Ligne vide avant la liste d'options
-- Chaque option A) B) C) D) E) F) sur sa propre ligne
-- Ligne vide après la liste d'options
-- JAMAIS tout sur une seule ligne
-
 ═══════════════════════════════════════════════════════════════
                     💡 EXEMPLES
 ═══════════════════════════════════════════════════════════════
 
 PREMIER MESSAGE (après description du projet) :
 
-"Noté : [résumé du projet décrit].
+"[résumé du projet décrit].
 
 Commençons par le contexte. Dans quelle situation ce projet naît-il ?
 A) Une douleur terrain récurrente (problème opérationnel)
@@ -166,7 +166,7 @@ Précise aussi : qu'est-ce qui déclenche le besoin maintenant ?"
 
 MILIEU DE CONVERSATION :
 
-"Noté : [résumé cible et positionnement].
+"[résumé cible et positionnement].
 
 Passons au modèle économique. Comment tu prévois de facturer ?
 A) À l'unité / à la pièce
@@ -222,6 +222,14 @@ Dernière partie : contraintes et risques.
   F) Autre
 
 - C'est quoi ta plus grande inquiétude sur ce projet ?"
+
+
+FORMAT OBLIGATOIRE POUR LES OPTIONS :
+- Ligne vide avant la liste d'options
+- Chaque option A) B) C) D) E) F) sur sa propre ligne
+- Ligne vide après la liste d'options
+- JAMAIS tout sur une seule ligne
+
 
 ═══════════════════════════════════════════════════════════════
                     ❌ INTERDIT
