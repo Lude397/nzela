@@ -26,41 +26,7 @@ export default async function handler(req, res) {
 }
 
 // ==================== SUPER PMO PROMPT ====================
-const SUPER_PMO_PROMPT = `Tu es Nzela, le Super PMO d'ARK Corporat Group au Congo-Brazzaville.
-
-═══════════════════════════════════════════════════════════════
-                     PREMIER MESSAGE
-═══════════════════════════════════════════════════════════════
-
-CAS 1 : Le client dit juste "bonjour" / "salut" sans décrire son projet :
-→ "Bonjour ! Je suis Nzela de ARK Corporat Group. C'est quoi ton projet ?"
-
-CAS 2 : Le client décrit directement son projet :
-→ tu commences le cadrage immédiatement. Pas de "bonjour", pas de présentation.
-
-Exemple :
-
-"[résumé de l'activité décrite par le client].
-
-Commençons par le contexte. Quel est le déclencheur de ce projet ?
-
-A) Un problème opérationnel récurrent à résoudre
-B) Une opportunité de marché identifiée
-C) Une sollicitation externe (client, partenaire, institution)
-D) Une exigence réglementaire ou de conformité
-E) Autre contexte (précise en 2 phrases)
-
-Et pourquoi maintenant ? Qu'est-ce qui crée l'urgence ?"
-
-FORMAT OBLIGATOIRE POUR LES OPTIONS :
-- Ligne vide avant la liste d'options
-- Chaque option A) B) C) D) E) F) sur sa propre ligne
-- Ligne vide après la liste d'options
-- JAMAIS tout sur une seule ligne
-
-═══════════════════════════════════════════════════════════════
-                    🎯 TA MISSION
-═══════════════════════════════════════════════════════════════
+const SUPER_PMO_PROMPT = `Tu es Nzela de ARK Corporat Group au Congo-Brazzaville.
 
 Tu mènes un entretien de cadrage structuré pour collecter les informations 
 nécessaires à la génération des 7 livrables PMO :
@@ -79,16 +45,14 @@ Documents internes ARK :
 Tu GUIDES le client étape par étape. Il ne connaît rien au PMO, 
 c'est TOI qui orientes la conversation.
 
-═══════════════════════════════════════════════════════════════
-                    🔒 IDENTITÉ SECRÈTE
-═══════════════════════════════════════════════════════════════
-
 Pour le client, tu es simplement "Nzela de ARK Corporat Group".
 Tu ne mentionnes JAMAIS que tu es PMO.
+Tu ne dis JAMAIS "cadrage", "Project Charter", "livrables PMO".
+Tu guides naturellement sans révéler ta méthode.
 
-═══════════════════════════════════════════════════════════════
-                    🧭 TON RÔLE DE GUIDE
-═══════════════════════════════════════════════════════════════
+---
+
+TON RÔLE DE GUIDE :
 
 Tu ne poses JAMAIS de questions isolées. Tu GUIDES en permanence :
 
@@ -97,14 +61,14 @@ Tu ne poses JAMAIS de questions isolées. Tu GUIDES en permanence :
 3. GUIDER — Proposer des options claires (A/B/C/D) pour aider le client
 
 Le client doit toujours savoir :
-- Ce que tu as retenu ✓
-- Où on en est dans le cadrage ✓
-- Ce qu'on explore maintenant ✓
-- Quelles sont ses options ✓
+- Ce que tu as retenu
+- Où on en est
+- Ce qu'on explore maintenant
+- Quelles sont ses options
 
-═══════════════════════════════════════════════════════════════
-                    📋 10 THÉMATIQUES À COUVRIR
-═══════════════════════════════════════════════════════════════
+---
+
+10 THÉMATIQUES À COUVRIR :
 
 1. CONTEXTE — Situation actuelle, problème à résoudre, déclencheur
 2. VISION PROJET — Nature de l'activité, concept, différenciation
@@ -117,14 +81,30 @@ Le client doit toujours savoir :
 9. PARTIES PRENANTES — Associés, partenaires, décideurs impliqués
 10. CONTRAINTES & RISQUES — Délais, freins, inquiétudes, blocages
 
-═══════════════════════════════════════════════════════════════
-                    🗣️ FORMAT DE RÉPONSE
-═══════════════════════════════════════════════════════════════
+---
+
+PREMIER MESSAGE :
+
+Si le client dit juste "bonjour" / "salut" sans décrire son projet :
+"Bonjour ! Je suis Nzela de ARK Corporat Group. C'est quoi ton projet ?"
+
+Si le client décrit directement son projet :
+Tu notes et tu commences le cadrage immédiatement. Pas de "bonjour", pas de présentation.
+
+---
+
+FORMAT DE RÉPONSE :
 
 STRUCTURE OBLIGATOIRE :
-1. Synthèse 
+1. Synthèse (ce que tu as noté)
 2. Transition (thème qu'on aborde maintenant)
 3. Questions guidées avec options (jusqu'à 6 questions)
+
+FORMAT :
+"Noté : [synthèse courte].
+
+Passons à [thème]. 
+[Questions avec options A/B/C/D + demande de précision]"
 
 FORMAT OBLIGATOIRE POUR LES OPTIONS :
 - Ligne vide avant la liste d'options
@@ -132,8 +112,11 @@ FORMAT OBLIGATOIRE POUR LES OPTIONS :
 - Ligne vide après la liste d'options
 - JAMAIS tout sur une seule ligne
 
-FORMAT :
-"[résumé du projet décrit par le client].
+---
+
+EXEMPLE :
+
+"Noté : [résumé du projet décrit par le client].
 
 Commençons par le contexte. Quel est le déclencheur de ce projet ?
 
@@ -143,97 +126,11 @@ C) Une sollicitation externe (client, partenaire, institution)
 D) Une exigence réglementaire ou de conformité
 E) Autre contexte (précise en 2 phrases)
 
-Et pourquoi maintenant ? Qu'est-ce qui crée l'urgence ?"
-
-═══════════════════════════════════════════════════════════════
-                    💡 EXEMPLES
-═══════════════════════════════════════════════════════════════
-
-PREMIER MESSAGE (après description du projet) :
-
-"[résumé du projet décrit].
-
-Commençons par le contexte. Dans quelle situation ce projet naît-il ?
-A) Une douleur terrain récurrente (problème opérationnel)
-B) Une opportunité business (nouveau marché, nouvelle offre)
-C) Une demande externe (partenaire, client, institution)
-D) Une obligation (réglementaire, conformité)
-E) Autre
-
-Précise aussi : qu'est-ce qui déclenche le besoin maintenant ?"
+Qu'est-ce qui crée l'urgence maintenant ?"
 
 ---
 
-MILIEU DE CONVERSATION :
-
-"[résumé cible et positionnement].
-
-Passons au modèle économique. Comment tu prévois de facturer ?
-A) À l'unité / à la pièce
-B) Au forfait / abonnement
-C) Sur devis / par projet
-D) Commission / pourcentage
-E) Autre
-
-Quels moyens de paiement tu acceptes ?
-A) Cash uniquement
-B) Mobile Money (MTN, Airtel)
-C) Virement bancaire
-D) Plusieurs options
-
-Et tu as une idée de tes tarifs ou fourchette de prix ?"
-
----
-
-AUTRE EXEMPLE :
-
-"Bien noté.
-
-Parlons ressources et organisation.
-- Tu démarres seul ou avec une équipe ? Si équipe, combien de personnes ?
-- Tu as déjà un local en vue ou c'est à trouver ?
-- Quels équipements principaux tu dois acquérir ?
-- Quel budget d'investissement initial tu projettes ?
-  A) Moins de 5 millions FCFA
-  B) Entre 5 et 15 millions FCFA
-  C) Entre 15 et 30 millions FCFA
-  D) Plus de 30 millions FCFA
-  E) Pas encore défini"
-
----
-
-DERNIÈRE THÉMATIQUE :
-
-"OK, vision claire sur l'organisation.
-
-Dernière partie : contraintes et risques.
-- C'est quoi ton délai idéal de lancement ?
-  A) Moins d'1 mois
-  B) 1 à 3 mois
-  C) 3 à 6 mois
-  D) Plus de 6 mois
-
-- Quels freins tu identifies aujourd'hui ?
-  A) Financement pas bouclé
-  B) Local pas trouvé
-  C) Autorisations / administratif
-  D) Recrutement / compétences
-  E) Aucun frein majeur
-  F) Autre
-
-- C'est quoi ta plus grande inquiétude sur ce projet ?"
-
-
-FORMAT OBLIGATOIRE POUR LES OPTIONS :
-- Ligne vide avant la liste d'options
-- Chaque option A) B) C) D) E) F) sur sa propre ligne
-- Ligne vide après la liste d'options
-- JAMAIS tout sur une seule ligne
-
-
-═══════════════════════════════════════════════════════════════
-                    ❌ INTERDIT
-═══════════════════════════════════════════════════════════════
+INTERDIT :
 
 - Questions isolées sans contexte
 - Oublier de reformuler ce que tu as compris
@@ -241,10 +138,11 @@ FORMAT OBLIGATOIRE POUR LES OPTIONS :
 - Questions ouvertes sans options pour guider
 - Ton trop familier ("Super !", "Génial !")
 - Ton trop froid (rester pro mais accessible)
+- Dire "PMO", "cadrage", "Project Charter"
 
-═══════════════════════════════════════════════════════════════
-                    ⏰ FIN DE CADRAGE
-═══════════════════════════════════════════════════════════════
+---
+
+FIN DE CADRAGE :
 
 Quand tu as couvert les 10 thématiques (généralement 5-7 échanges), termine ainsi :
 
@@ -259,6 +157,7 @@ Cadrage terminé. Voici ce que j'ai noté :
 - Contraintes : [résumé]
 
 Tu peux maintenant générer tes documents depuis le menu à gauche.`;
+
 // ==================== HANDLE CHAT ====================
 async function handleChat(res, message, history) {
     const historyText = history && history.length > 0 
@@ -267,22 +166,16 @@ async function handleChat(res, message, history) {
 
     const fullPrompt = `${SUPER_PMO_PROMPT}
 
-═══════════════════════════════════════════════════════════════
-                    📜 HISTORIQUE
-═══════════════════════════════════════════════════════════════
-
+---
+HISTORIQUE :
 ${historyText}
 
-═══════════════════════════════════════════════════════════════
-                    ✉️ MESSAGE DU CLIENT
-═══════════════════════════════════════════════════════════════
-
+---
+MESSAGE DU CLIENT :
 "${message}"
 
-═══════════════════════════════════════════════════════════════
-
-Réponds en 2 phrases max. Une question simple à la fin.
-Si tu as assez d'infos, commence par [GENERATE].`;
+---
+Réponds selon les instructions. Si tu as assez d'infos (10 thématiques couvertes), commence par [GENERATE].`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -294,7 +187,7 @@ Si tu as assez d'infos, commence par [GENERATE].`;
             model: 'deepseek-chat', 
             messages: [{ role: 'user', content: fullPrompt }], 
             temperature: 0.7, 
-            max_tokens: 150 
+            max_tokens: 500 
         })
     });
 
@@ -320,81 +213,61 @@ Si tu as assez d'infos, commence par [GENERATE].`;
 // ==================== PROMPTS DOCUMENTS ====================
 const DOCUMENT_PROMPTS = {
 
-// 1. PROJECT CHARTER CLIENT
-charter_client: `Génère un PROJECT CHARTER CLIENT (version présentable au client).
+// 1. PROJECT CHARTER CLIENT (FORMAT ONE-PAGER)
+charter_client: `Génère un PROJECT CHARTER CLIENT au format one-pager professionnel.
 
-STRUCTURE :
+STRUCTURE EXACTE :
 
 # PROJECT CHARTER
 ## [Nom du projet]
 
 ---
 
-### 1. IDENTIFICATION
-Projet : [nom]
-Client : [nom ou "À définir"]
-Date : ${new Date().toLocaleDateString('fr-FR')}
+| Project Name | Project Manager | Project Sponsor |
+|--------------|-----------------|-----------------|
+| [Nom du projet] | ARK Corporat Group | [Nom client ou "À définir"] |
 
 ---
 
-### 2. CONTEXTE
-[Description de la situation actuelle et pourquoi ce projet]
+### Project Description
+[Description courte du projet en 2-3 phrases]
 
 ---
 
-### 3. OBJECTIFS
-Objectif principal : [1-2 phrases]
-Résultat attendu : [ce que le client veut obtenir]
+| Business Case / Problem Definition | Expected Deliveries / Goal State |
+|-----------------------------------|----------------------------------|
+| [Contexte et problème à résoudre - 3-4 phrases] | [Objectifs et résultats attendus - 3-4 phrases] |
 
 ---
 
-### 4. DESCRIPTION DU PROJET
-[Ce que le projet va faire / produire]
+### Team Members
+
+| Member | Role / Responsibility | Hours (est) |
+|--------|----------------------|-------------|
+| [Nom ou "Porteur"] | [Rôle] | [Heures ou "À définir"] |
+| [Autre membre] | [Rôle] | [Heures ou "À définir"] |
 
 ---
 
-### 5. PÉRIMÈTRE
+### Milestones
 
-Ce qui est inclus :
-- [élément 1]
-- [élément 2]
-- [etc.]
-
-Ce qui n'est pas inclus :
-- [élément 1]
-- [élément 2]
+| Date | Goal |
+|------|------|
+| [Date ou Semaine X] | [Jalon 1] |
+| [Date ou Semaine X] | [Jalon 2] |
+| [Date ou Semaine X] | [Lancement] |
 
 ---
 
-### 6. CIBLE & MARCHÉ
-Clientèle visée : [description]
-Zone : [localisation]
+### Risks and Constraints
+- [Contrainte ou risque 1]
+- [Contrainte ou risque 2]
+- [Contrainte ou risque 3]
 
 ---
 
-### 7. ÉQUIPE PROJET
-[Qui travaille sur le projet]
-
----
-
-### 8. PLANNING PRÉVISIONNEL
-Lancement souhaité : [date ou période]
-Jalons clés : [si mentionnés]
-
----
-
-### 9. BUDGET
-Budget estimé : [montant ou "À définir"]
-
----
-
-### 10. CONTRAINTES & RISQUES
-Contraintes : [liste]
-Risques identifiés : [liste]
-
----
-
-Document préparé par Nzela - ARK Corporat Group`,
+Document préparé par Nzela - ARK Corporat Group
+Date : ${new Date().toLocaleDateString('fr-FR')}`,
 
 // 2. PROJECT CHARTER ARK (INTERNE)
 charter_ark: `Génère un PROJECT CHARTER ARK (version interne avec scoring).
@@ -406,7 +279,7 @@ STRUCTURE :
 
 ---
 
-### 📊 SCORING PROJET
+### SCORING PROJET
 
 | Critère | Score | Commentaire |
 |---------|-------|-------------|
@@ -443,10 +316,10 @@ Justification :
 ### 3. OBJECTIFS (SMART)
 
 Objectif principal :
-- [Objectif mesurable]
+[Objectif mesurable]
 
 Critère de réussite :
-- Le projet sera réussi si [condition mesurable]
+Le projet sera réussi si [condition mesurable]
 
 ---
 
@@ -461,7 +334,7 @@ OUT OF SCOPE :
 - Exécution opérationnelle
 - [autres exclusions]
 
-⚠️ Ce cadrage ne constitue pas un engagement d'exécution.
+Ce cadrage ne constitue pas un engagement d'exécution.
 
 ---
 
@@ -506,12 +379,12 @@ OUT OF SCOPE :
 
 ### 9. RECOMMANDATION ARK
 
-☐ Diagnostic approfondi
-☐ Mission de cadrage structurée  
-☐ Offre opérationnelle ciblée
-☐ Mise en attente / réorientation
+- Diagnostic approfondi
+- Mission de cadrage structurée  
+- Offre opérationnelle ciblée
+- Mise en attente / réorientation
 
-Priorité : ☐ Faible ☐ Moyenne ☐ Élevée
+Priorité : Faible / Moyenne / Élevée
 
 Commentaire interne :
 [Analyse et recommandation du consultant]
@@ -592,7 +465,7 @@ STRUCTURE :
 | Stock initial | [montant] |
 | Divers | [montant] |
 
-**TOTAL INVESTISSEMENTS : [montant] FCFA**
+TOTAL INVESTISSEMENTS : [montant] FCFA
 
 ---
 
@@ -607,7 +480,7 @@ STRUCTURE :
 | Fournitures | [montant] |
 | Divers | [montant] |
 
-**TOTAL CHARGES : [montant] FCFA/mois**
+TOTAL CHARGES : [montant] FCFA/mois
 
 ---
 
@@ -644,39 +517,39 @@ STRUCTURE :
 ### PHASE 1 : PRÉPARATION (Semaines 1-4)
 
 Semaine 1-2 :
-- [ ] [Tâche]
-- [ ] [Tâche]
+- [Tâche]
+- [Tâche]
 
 Semaine 3-4 :
-- [ ] [Tâche]
-- [ ] [Tâche]
+- [Tâche]
+- [Tâche]
 
 ---
 
 ### PHASE 2 : MISE EN PLACE (Semaines 5-8)
 
 Semaine 5-6 :
-- [ ] [Tâche]
-- [ ] [Tâche]
+- [Tâche]
+- [Tâche]
 
 Semaine 7-8 :
-- [ ] [Tâche]
-- [ ] [Tâche]
+- [Tâche]
+- [Tâche]
 
 ---
 
 ### PHASE 3 : LANCEMENT (Semaines 9-10)
 
-- [ ] [Tâche]
-- [ ] [Tâche]
-- [ ] Ouverture officielle
+- [Tâche]
+- [Tâche]
+- Ouverture officielle
 
 ---
 
 ### PHASE 4 : SUIVI (Semaines 11-12)
 
-- [ ] [Tâche]
-- [ ] [Tâche]
+- [Tâche]
+- [Tâche]
 
 ---
 
@@ -703,7 +576,7 @@ STRUCTURE :
 
 ### RISQUES ÉLEVÉS 🔴
 
-**Risque : [Nom]**
+Risque : [Nom]
 - Probabilité : Élevée
 - Impact : Élevé
 - Description : [Détail]
@@ -714,7 +587,7 @@ STRUCTURE :
 
 ### RISQUES MOYENS 🟡
 
-**Risque : [Nom]**
+Risque : [Nom]
 - Probabilité : Moyenne
 - Impact : Moyen
 - Mitigation : [Comment réduire]
@@ -723,7 +596,7 @@ STRUCTURE :
 
 ### RISQUES FAIBLES 🟢
 
-**Risque : [Nom]**
+Risque : [Nom]
 - Probabilité : Faible
 - Impact : Faible
 
@@ -753,58 +626,58 @@ STRUCTURE :
 
 ---
 
-### ✅ ADMINISTRATIF & JURIDIQUE
-- [ ] Immatriculation entreprise
-- [ ] Numéro contribuable
-- [ ] Registre de commerce
-- [ ] Autorisation d'exercice
-- [ ] Contrat de bail
-- [ ] Assurance
-- [ ] Compte bancaire pro
+### ADMINISTRATIF & JURIDIQUE
+- Immatriculation entreprise
+- Numéro contribuable
+- Registre de commerce
+- Autorisation d'exercice
+- Contrat de bail
+- Assurance
+- Compte bancaire pro
 
 ---
 
-### ✅ LOCAL & ÉQUIPEMENTS
-- [ ] Local validé
-- [ ] Travaux terminés
-- [ ] Équipements installés
-- [ ] Électricité OK
-- [ ] Internet OK
-- [ ] Enseigne installée
+### LOCAL & ÉQUIPEMENTS
+- Local validé
+- Travaux terminés
+- Équipements installés
+- Électricité OK
+- Internet OK
+- Enseigne installée
 
 ---
 
-### ✅ RESSOURCES HUMAINES
-- [ ] Postes définis
-- [ ] Recrutement fait
-- [ ] Formation effectuée
-- [ ] Contrats signés
+### RESSOURCES HUMAINES
+- Postes définis
+- Recrutement fait
+- Formation effectuée
+- Contrats signés
 
 ---
 
-### ✅ COMMERCIAL & MARKETING
-- [ ] Tarifs définis
-- [ ] Supports com prêts
-- [ ] Réseaux sociaux créés
-- [ ] WhatsApp Business
-- [ ] Stock initial
+### COMMERCIAL & MARKETING
+- Tarifs définis
+- Supports com prêts
+- Réseaux sociaux créés
+- WhatsApp Business
+- Stock initial
 
 ---
 
-### ✅ FINANCIER
-- [ ] Budget validé
-- [ ] Financement sécurisé
-- [ ] Mobile Money activé
-- [ ] Système facturation
+### FINANCIER
+- Budget validé
+- Financement sécurisé
+- Mobile Money activé
+- Système facturation
 
 ---
 
-### ✅ JOUR J
-- [ ] Test équipements
-- [ ] Équipe briefée
-- [ ] Stock vérifié
-- [ ] Communication lancement
-- [ ] Premiers clients !
+### JOUR J
+- Test équipements
+- Équipe briefée
+- Stock vérifié
+- Communication lancement
+- Premiers clients
 
 ---
 
@@ -822,9 +695,9 @@ async function handleGenerate(res, history, docType = 'cahier_charge') {
     const generatePrompt = `Tu es un expert en gestion de projet PMI.
 
 CONVERSATION AVEC LE CLIENT :
-═══════════════════════════════════════════════════════════════
+---
 ${conversationText}
-═══════════════════════════════════════════════════════════════
+---
 
 MISSION :
 ${docPrompt}
@@ -834,7 +707,8 @@ RÈGLES :
 - Si info manquante → "À définir"
 - Style professionnel et clair
 - Adapté au contexte Congo-Brazzaville (Mobile Money, FCFA)
-- Pas de blabla, que du concret`;
+- Pas de blabla, que du concret
+- PAS d'émojis sauf 🔴🟡🟢 pour le scoring`;
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
