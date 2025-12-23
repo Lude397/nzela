@@ -1155,6 +1155,9 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+            // Retour à la ligne avant chaque option A) B) C) D) E) F)
+            html = html.replace(/([A-F]\))/g, '<br><br>$1');
+            return html;
         }
 
         function scrollToBottom() {
