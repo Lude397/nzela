@@ -1156,7 +1156,12 @@
             div.textContent = text;
             return div.innerHTML;
             // Retour à la ligne avant chaque option A) B) C) D) E) F)
-            html = html.replace(/([A-F]\))/g, '<br><br>$1');
+            html = html.replace(/ A\)/g, '<br><br>A)');
+            html = html.replace(/ B\)/g, '<br><br>B)');
+            html = html.replace(/ C\)/g, '<br><br>C)');
+            html = html.replace(/ D\)/g, '<br><br>D)');
+            html = html.replace(/ E\)/g, '<br><br>E)');
+            html = html.replace(/ F\)/g, '<br><br>F)');
             return html;
         }
 
