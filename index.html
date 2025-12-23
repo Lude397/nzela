@@ -127,7 +127,11 @@
         }
 
         .doc-item-icon {
-            font-size: 18px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .doc-item-text {
@@ -219,7 +223,7 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             color: var(--text-primary);
-            font-size: 18px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -613,6 +617,27 @@
             color: var(--text-primary);
         }
 
+        .document-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .document-body th {
+            border: 1px solid var(--border);
+            padding: 12px;
+            background: var(--bg-primary);
+            color: var(--accent);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .document-body td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            color: var(--text-secondary);
+        }
+
         .document-actions {
             position: fixed;
             bottom: 0;
@@ -786,7 +811,11 @@
         }
 
         .modal-doc-icon {
-            font-size: 24px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .modal-doc-info {
@@ -806,6 +835,7 @@
 
         .modal-doc-status {
             font-size: 16px;
+            color: var(--success);
         }
 
         /* ===== SCROLLBAR ===== */
@@ -861,33 +891,33 @@
                 <div class="sidebar-section-title">Documents</div>
                 <div class="doc-list" id="docList">
                     <div class="doc-item disabled" data-doc="charter_client">
-                        <span class="doc-item-icon">📄</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Project Charter Client</span>
                     </div>
                     <div class="doc-item disabled" data-doc="charter_ark">
-                        <span class="doc-item-icon">🔒</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Project Charter ARK</span>
                         <span class="doc-item-badge">Interne</span>
                     </div>
                     <div class="doc-item disabled" data-doc="cahier_charge">
-                        <span class="doc-item-icon">📋</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Cahier de charge</span>
                     </div>
                     <div class="doc-item disabled" data-doc="budget">
-                        <span class="doc-item-icon">💰</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Budget prévisionnel</span>
                     </div>
                     <div class="doc-item disabled" data-doc="plan_projet">
-                        <span class="doc-item-icon">📅</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Plan de projet</span>
                     </div>
                     <div class="doc-item disabled" data-doc="risques">
-                        <span class="doc-item-icon">⚠️</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Matrice des risques</span>
                         <span class="doc-item-badge">Interne</span>
                     </div>
                     <div class="doc-item disabled" data-doc="checklist">
-                        <span class="doc-item-icon">✅</span>
+                        <span class="doc-item-icon"></span>
                         <span class="doc-item-text">Checklist lancement</span>
                     </div>
                 </div>
@@ -895,7 +925,7 @@
 
             <div class="sidebar-footer">
                 <button class="btn-new-project" onclick="newProject()">
-                    ✨ Nouveau projet
+                    + Nouveau projet
                 </button>
             </div>
         </aside>
@@ -906,7 +936,7 @@
             <div class="mobile-header" id="mobileHeader">
                 <div class="logo"><span>N</span></div>
                 <h1 class="mobile-header-title">Nzela</h1>
-                <button class="btn-docs-mobile" id="btnDocsMobile">📄</button>
+                <button class="btn-docs-mobile" id="btnDocsMobile">Docs</button>
             </div>
 
             <!-- Écran d'accueil -->
@@ -954,10 +984,10 @@
                 <div class="document-actions">
                     <div class="document-actions-inner">
                         <button class="btn-action btn-copy" onclick="copyDocument()">
-                            📋 Copier
+                            Copier
                         </button>
                         <button class="btn-action btn-whatsapp" onclick="sendWhatsApp()">
-                            💬 WhatsApp
+                            WhatsApp
                         </button>
                     </div>
                 </div>
@@ -970,7 +1000,7 @@
         <div class="modal-docs">
             <div class="modal-header">
                 <h3 class="modal-title">Documents disponibles</h3>
-                <button class="modal-close" onclick="closeDocsModal()">✕</button>
+                <button class="modal-close" onclick="closeDocsModal()">×</button>
             </div>
             <div class="modal-body" id="modalDocsList">
                 <!-- Généré dynamiquement -->
@@ -985,13 +1015,13 @@
         };
 
         const DOCUMENTS = [
-            { id: 'charter_client', icon: '📄', name: 'Project Charter Client', desc: 'Document de cadrage client' },
-            { id: 'charter_ark', icon: '🔒', name: 'Project Charter ARK', desc: 'Version interne avec scoring', badge: 'Interne' },
-            { id: 'cahier_charge', icon: '📋', name: 'Cahier de charge', desc: 'Fonctionnalités détaillées' },
-            { id: 'budget', icon: '💰', name: 'Budget prévisionnel', desc: 'Investissements et charges' },
-            { id: 'plan_projet', icon: '📅', name: 'Plan de projet', desc: 'Phases et jalons' },
-            { id: 'risques', icon: '⚠️', name: 'Matrice des risques', desc: 'Risques identifiés', badge: 'Interne' },
-            { id: 'checklist', icon: '✅', name: 'Checklist lancement', desc: 'Todo avant ouverture' }
+            { id: 'charter_client', name: 'Project Charter Client', desc: 'Document de cadrage client' },
+            { id: 'charter_ark', name: 'Project Charter ARK', desc: 'Version interne avec scoring', badge: 'Interne' },
+            { id: 'cahier_charge', name: 'Cahier de charge', desc: 'Fonctionnalités détaillées' },
+            { id: 'budget', name: 'Budget prévisionnel', desc: 'Investissements et charges' },
+            { id: 'plan_projet', name: 'Plan de projet', desc: 'Phases et jalons' },
+            { id: 'risques', name: 'Matrice des risques', desc: 'Risques identifiés', badge: 'Interne' },
+            { id: 'checklist', name: 'Checklist lancement', desc: 'Todo avant ouverture' }
         ];
 
         const DOCUMENT_NAMES = {};
@@ -1002,6 +1032,7 @@
             currentDocument: '',
             currentDocType: '',
             generatedDocs: [],
+            documentsCache: {},  // CACHE pour éviter re-génération
             conversationReady: false
         };
 
@@ -1052,7 +1083,7 @@
             elements.docList.querySelectorAll('.doc-item').forEach(item => {
                 item.addEventListener('click', () => {
                     if (!item.classList.contains('disabled')) {
-                        generateDocument(item.dataset.doc);
+                        showDocument(item.dataset.doc);
                     }
                 });
             });
@@ -1072,7 +1103,7 @@
         function renderMobileDocsList() {
             elements.modalDocsList.innerHTML = DOCUMENTS.map(doc => `
                 <div class="modal-doc-item ${state.conversationReady ? '' : 'disabled'}" data-doc="${doc.id}" onclick="handleMobileDocClick('${doc.id}')">
-                    <span class="modal-doc-icon">${doc.icon}</span>
+                    <span class="modal-doc-icon"></span>
                     <div class="modal-doc-info">
                         <div class="modal-doc-title">${doc.name}</div>
                         <div class="modal-doc-desc">${doc.desc}</div>
@@ -1085,7 +1116,7 @@
         function handleMobileDocClick(docId) {
             if (!state.conversationReady) return;
             closeDocsModal();
-            generateDocument(docId);
+            showDocument(docId);
         }
 
         function updateDocsList() {
@@ -1152,17 +1183,17 @@
         }
 
         function escapeHtml(text) {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>')
-        .split(' A)').join('<br><br>A)')
-        .split(' B)').join('<br><br>B)')
-        .split(' C)').join('<br><br>C)')
-        .split(' D)').join('<br><br>D)')
-        .split(' E)').join('<br><br>E)')
-        .split(' F)').join('<br><br>F)');
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br>')
+                .split(' A)').join('<br><br>A)')
+                .split(' B)').join('<br><br>B)')
+                .split(' C)').join('<br><br>C)')
+                .split(' D)').join('<br><br>D)')
+                .split(' E)').join('<br><br>E)')
+                .split(' F)').join('<br><br>F)');
         }
 
         function scrollToBottom() {
@@ -1218,6 +1249,22 @@
             }
         }
 
+        // ===== SHOW DOCUMENT (avec cache) =====
+        function showDocument(docType) {
+            // Si déjà en cache, afficher directement
+            if (state.documentsCache[docType]) {
+                state.currentDocument = state.documentsCache[docType];
+                state.currentDocType = docType;
+                elements.documentBadge.textContent = DOCUMENT_NAMES[docType];
+                renderDocument(state.currentDocument);
+                switchScreen('document');
+                return;
+            }
+            
+            // Sinon, générer
+            generateDocument(docType);
+        }
+
         async function generateDocument(docType) {
             elements.loadingText.textContent = `Je prépare ton ${DOCUMENT_NAMES[docType].toLowerCase()}...`;
             switchScreen('loading');
@@ -1236,8 +1283,11 @@
                 const data = await response.json();
 
                 if (data.success && data.document) {
+                    // Sauvegarder en cache
+                    state.documentsCache[docType] = data.document;
                     state.currentDocument = data.document;
                     state.currentDocType = docType;
+                    
                     if (!state.generatedDocs.includes(docType)) {
                         state.generatedDocs.push(docType);
                     }
@@ -1258,44 +1308,68 @@
         }
 
         function renderDocument(text) {
-    // Convertir les tableaux Markdown
-    text = text.replace(/\|(.+)\|\n\|[-:| ]+\|\n([\s\S]*?)(?=\n\n|\n#|$)/gm, function(match, header, body) {
-        const headers = header.split('|').filter(h => h.trim());
-        const rows = body.trim().split('\n');
-        
-        let table = '<table style="width:100%; border-collapse:collapse; margin:20px 0;">';
-        table += '<tr>' + headers.map(h => '<th style="border:1px solid #2a2a2a; padding:12px; background:#1a1a1a; color:#d4a574; text-align:left;">' + h.trim() + '</th>').join('') + '</tr>';
-        
-        rows.forEach(row => {
-            const cells = row.split('|').filter(c => c.trim());
-            if (cells.length > 0) {
-                table += '<tr>' + cells.map(c => '<td style="border:1px solid #2a2a2a; padding:12px; color:#a0a0a0;">' + c.trim() + '</td>').join('') + '</tr>';
+            // Convertir les tableaux Markdown ligne par ligne
+            const lines = text.split('\n');
+            let inTable = false;
+            let tableHtml = '';
+            let result = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Détecte une ligne de tableau (commence et finit par |)
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    // Ignore la ligne de séparation (|---|---|)
+                    if (line.match(/^\|[\s\-:|]+\|$/)) continue;
+                    
+                    const cells = line.split('|').filter(c => c.trim() !== '');
+                    
+                    if (!inTable) {
+                        // Première ligne = header
+                        inTable = true;
+                        tableHtml = '<table>';
+                        tableHtml += '<tr>' + cells.map(c => '<th>' + c.trim() + '</th>').join('') + '</tr>';
+                    } else {
+                        // Lignes suivantes = body
+                        tableHtml += '<tr>' + cells.map(c => '<td>' + c.trim() + '</td>').join('') + '</tr>';
+                    }
+                } else {
+                    // Fin du tableau
+                    if (inTable) {
+                        tableHtml += '</table>';
+                        result.push(tableHtml);
+                        tableHtml = '';
+                        inTable = false;
+                    }
+                    result.push(line);
+                }
             }
-        });
-        
-        table += '</table>';
-        return table;
-    });
+            
+            // Ferme le tableau si on finit dedans
+            if (inTable) {
+                tableHtml += '</table>';
+                result.push(tableHtml);
+            }
+            
+            let html = result.join('\n')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^\- (.*$)/gm, '• $1')
+                .replace(/\n/g, '<br>');
 
-    let html = text
-        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-        .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\- (.*$)/gm, '• $1')
-        .replace(/\n/g, '<br>');
-
-    elements.documentBody.innerHTML = html;
-}
+            elements.documentBody.innerHTML = html;
+        }
 
         // ===== FORMAT WHATSAPP =====
         function formatForWhatsApp(text) {
             return text
-                .replace(/^# (.*$)/gm, '📋 *$1*')
+                .replace(/^# (.*$)/gm, '*$1*')
                 .replace(/^## (.*$)/gm, '$1')
-                .replace(/^### \d+\. (.*$)/gm, '\n📌 *$1*')
-                .replace(/^### (.*$)/gm, '\n📌 *$1*')
+                .replace(/^### \d+\. (.*$)/gm, '\n*$1*')
+                .replace(/^### (.*$)/gm, '\n*$1*')
                 .replace(/^#### (.*$)/gm, '*$1*')
                 .replace(/---/g, '')
                 .replace(/\*\*(.*?)\*\*/g, '*$1*')
@@ -1333,6 +1407,7 @@
             state.currentDocument = '';
             state.currentDocType = '';
             state.generatedDocs = [];
+            state.documentsCache = {};  // Vider le cache
             state.conversationReady = false;
             elements.chatMessages.innerHTML = '';
             elements.welcomeInput.value = '';
