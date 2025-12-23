@@ -13,6 +13,7 @@
             --bg-primary: #0d0d0d;
             --bg-card: #1a1a1a;
             --bg-card-hover: #222222;
+            --bg-sidebar: #141414;
             --accent: #d4a574;
             --accent-light: #e8c9a8;
             --accent-glow: rgba(212, 165, 116, 0.3);
@@ -33,25 +34,201 @@
             line-height: 1.7;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(ellipse at 50% 0%, rgba(212, 165, 116, 0.08) 0%, transparent 50%),
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.4;
-            pointer-events: none;
-            z-index: -1;
-        }
-
+        /* ===== LAYOUT PRINCIPAL ===== */
         .app {
             height: 100%;
             display: flex;
-            flex-direction: column;
-            max-width: 1000px;
-            margin: 0 auto;
             position: relative;
+        }
+
+        /* ===== SIDEBAR (PC) ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent) 0%, #b8956a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .logo span {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--bg-primary);
+        }
+
+        .sidebar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar-section {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding: 0 8px;
+        }
+
+        .doc-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .doc-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .doc-item.active {
+            background: var(--bg-card);
+            border-color: var(--accent);
+        }
+
+        .doc-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .doc-item-icon {
+            font-size: 18px;
+        }
+
+        .doc-item-text {
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .doc-item-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        .doc-item-check {
+            color: var(--success);
+            font-size: 14px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-new-project {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-new-project:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-width: 0;
+        }
+
+        /* ===== HEADER MOBILE ===== */
+        .mobile-header {
+            display: none;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-header .logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .mobile-header .logo span {
+            font-size: 20px;
+        }
+
+        .mobile-header-title {
+            flex: 1;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .btn-docs-mobile {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-docs-mobile:hover {
+            border-color: var(--accent);
         }
 
         /* ===== ÉCRAN D'ACCUEIL ===== */
@@ -64,6 +241,7 @@
             padding: 40px 24px;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
+
         .welcome-screen.hidden {
             opacity: 0;
             transform: translateY(-20px);
@@ -72,18 +250,15 @@
             inset: 0;
         }
 
-        .logo {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--accent) 0%, #b8956a 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
             margin-bottom: 20px;
             box-shadow: 0 10px 40px var(--accent-glow);
             position: relative;
         }
-        .logo::after {
+
+        .welcome-logo::after {
             content: '';
             position: absolute;
             inset: -4px;
@@ -91,11 +266,9 @@
             border: 1px solid var(--accent);
             opacity: 0.3;
         }
-        .logo span {
-            font-family: 'Playfair Display', serif;
+
+        .welcome-logo span {
             font-size: 42px;
-            font-weight: 700;
-            color: var(--bg-primary);
         }
 
         .welcome-title {
@@ -104,6 +277,7 @@
             font-weight: 600;
             margin-bottom: 8px;
         }
+
         .welcome-tagline {
             color: var(--text-secondary);
             font-size: 15px;
@@ -115,6 +289,7 @@
             max-width: 500px;
             position: relative;
         }
+
         .welcome-textarea {
             width: 100%;
             min-height: 60px;
@@ -131,16 +306,20 @@
             max-height: 150px;
             overflow-y: auto;
         }
+
         .welcome-textarea:focus {
             outline: none;
             border-color: var(--accent);
         }
+
         .welcome-textarea::placeholder {
             color: var(--text-muted);
         }
+
         .welcome-send {
             position: absolute;
-            bottom: 12px; right: 12px;
+            bottom: 12px;
+            right: 12px;
             height: 40px;
             padding: 0 20px;
             background: linear-gradient(135deg, var(--accent) 0%, #b8956a 100%);
@@ -154,9 +333,11 @@
             transition: all 0.2s ease;
             opacity: 0.5;
         }
+
         .welcome-send.active {
             opacity: 1;
         }
+
         .welcome-send:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px var(--accent-glow);
@@ -169,31 +350,9 @@
             flex-direction: column;
             height: 100%;
         }
-        .chat-screen.visible { display: flex; }
 
-        .chat-header {
-            padding: 18px 24px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
+        .chat-screen.visible {
             display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .chat-header .logo {
-            width: 44px; height: 44px;
-            margin-bottom: 0;
-            box-shadow: none;
-        }
-        .chat-header .logo span { font-size: 22px; }
-        .chat-header-info { flex: 1; }
-        .chat-header-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            font-weight: 600;
-        }
-        .chat-header-status {
-            font-size: 13px;
-            color: var(--success);
         }
 
         .chat-messages {
@@ -210,12 +369,19 @@
             max-width: 80%;
             animation: messageIn 0.3s ease;
         }
+
         @keyframes messageIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .message.user { align-self: flex-end; }
-        .message.ai { align-self: flex-start; }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+        }
 
         .message-bubble {
             padding: 18px 22px;
@@ -224,11 +390,13 @@
             line-height: 1.75;
             letter-spacing: 0.2px;
         }
+
         .message.user .message-bubble {
             background: var(--accent);
             color: var(--bg-primary);
             border-bottom-right-radius: 4px;
         }
+
         .message.ai .message-bubble {
             background: var(--bg-card);
             color: var(--text-primary);
@@ -246,14 +414,18 @@
             border-bottom-left-radius: 4px;
             align-self: flex-start;
         }
+
         .typing-indicator span {
-            width: 10px; height: 10px;
+            width: 10px;
+            height: 10px;
             background: var(--accent);
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
+
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-8px); opacity: 1; }
@@ -264,11 +436,15 @@
             background: var(--bg-card);
             border-top: 1px solid var(--border);
         }
+
         .chat-input-wrapper {
             display: flex;
             gap: 14px;
             align-items: flex-end;
+            max-width: 800px;
+            margin: 0 auto;
         }
+
         .chat-input {
             flex: 1;
             background: var(--bg-primary);
@@ -282,15 +458,19 @@
             max-height: 140px;
             line-height: 1.6;
         }
+
         .chat-input:focus {
             outline: none;
             border-color: var(--accent);
         }
+
         .chat-input::placeholder {
             color: var(--text-muted);
         }
+
         .chat-send {
-            width: 52px; height: 52px;
+            width: 52px;
+            height: 52px;
             background: linear-gradient(135deg, var(--accent) 0%, #b8956a 100%);
             border: none;
             border-radius: 14px;
@@ -300,11 +480,20 @@
             justify-content: center;
             transition: all 0.2s ease;
             opacity: 0.5;
+            flex-shrink: 0;
         }
-        .chat-send.active { opacity: 1; }
-        .chat-send:hover { transform: translateY(-2px); }
+
+        .chat-send.active {
+            opacity: 1;
+        }
+
+        .chat-send:hover {
+            transform: translateY(-2px);
+        }
+
         .chat-send svg {
-            width: 22px; height: 22px;
+            width: 22px;
+            height: 22px;
             fill: var(--bg-primary);
         }
 
@@ -315,7 +504,10 @@
             flex-direction: column;
             height: 100%;
         }
-        .document-screen.visible { display: flex; }
+
+        .document-screen.visible {
+            display: flex;
+        }
 
         .document-header {
             padding: 18px 24px;
@@ -325,18 +517,36 @@
             align-items: center;
             gap: 14px;
         }
-        .document-header .logo {
-            width: 44px; height: 44px;
-            margin-bottom: 0;
-            box-shadow: none;
+
+        .btn-back {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
-        .document-header .logo span { font-size: 22px; }
-        .document-header-info { flex: 1; }
+
+        .btn-back:hover {
+            border-color: var(--accent);
+        }
+
+        .document-header-info {
+            flex: 1;
+        }
+
         .document-header-title {
             font-family: 'Playfair Display', serif;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
         }
+
         .document-header-badge {
             font-size: 12px;
             color: var(--accent);
@@ -348,7 +558,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 28px 24px;
-            padding-bottom: 180px;
+            padding-bottom: 140px;
         }
 
         .document-body {
@@ -359,6 +569,8 @@
             font-size: 15px;
             line-height: 2;
             letter-spacing: 0.2px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .document-body h1 {
@@ -403,22 +615,21 @@
 
         .document-actions {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            right: 0;
+            left: 280px;
             padding: 20px 24px;
             background: linear-gradient(to top, var(--bg-primary) 80%, transparent);
             z-index: 100;
         }
+
         .document-actions-inner {
-            max-width: 960px;
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
-            flex-direction: column;
             gap: 12px;
         }
-        .document-actions-row {
-            display: flex;
-            gap: 12px;
-        }
+
         .btn-action {
             flex: 1;
             display: flex;
@@ -434,105 +645,21 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-action:hover {
             transform: translateY(-2px);
         }
+
         .btn-whatsapp {
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
             box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
         }
+
         .btn-copy {
             background: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border);
-        }
-        .btn-other {
-            background: var(--accent);
-            color: var(--bg-primary);
-        }
-        .btn-new {
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        /* ===== MODAL CHOIX DOCUMENT ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            padding: 20px;
-        }
-        .modal-overlay.visible {
-            display: flex;
-        }
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 28px;
-            max-width: 400px;
-            width: 100%;
-            animation: modalIn 0.3s ease;
-        }
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .modal-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .modal-option {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 16px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .modal-option:hover {
-            border-color: var(--accent);
-            background: var(--bg-card-hover);
-        }
-        .modal-option-icon {
-            font-size: 24px;
-        }
-        .modal-option-text {
-            font-size: 15px;
-            font-weight: 500;
-        }
-        .modal-close {
-            margin-top: 16px;
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-muted);
-            font-family: inherit;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .modal-close:hover {
-            border-color: var(--text-muted);
-            color: var(--text-primary);
         }
 
         /* ===== LOADING ===== */
@@ -544,20 +671,26 @@
             align-items: center;
             padding: 40px 24px;
         }
-        .loading-screen.visible { display: flex; }
+
+        .loading-screen.visible {
+            display: flex;
+        }
 
         .loading-screen .logo {
             width: 100px;
             height: 100px;
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+
         .loading-screen .logo span {
             font-size: 52px;
         }
+
         .loading-text {
             margin-top: 28px;
             font-size: 17px;
@@ -565,88 +698,260 @@
             text-align: center;
         }
 
-        /* Scrollbar */
+        /* ===== MODAL DOCUMENTS MOBILE ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-docs {
+            background: var(--bg-card);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .modal-doc-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-doc-item:hover {
+            border-color: var(--accent);
+        }
+
+        .modal-doc-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .modal-doc-icon {
+            font-size: 24px;
+        }
+
+        .modal-doc-info {
+            flex: 1;
+        }
+
+        .modal-doc-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .modal-doc-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .modal-doc-status {
+            font-size: 16px;
+        }
+
+        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        /* Mobile */
-        @media (max-width: 768px) {
-            .app {
-                max-width: 100%;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
             }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .document-actions {
+                left: 0;
+            }
+
             .message {
                 max-width: 90%;
             }
-            .document-actions-row { 
-                flex-direction: column; 
-            }
+
             .chat-messages {
                 padding: 20px 16px;
                 padding-bottom: 100px;
             }
+
             .message-bubble {
                 padding: 14px 18px;
                 font-size: 16px;
+            }
+
+            .document-actions-inner {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Écran d'accueil -->
-        <div class="welcome-screen" id="welcomeScreen">
-            <div class="logo"><span>N</span></div>
-            <h1 class="welcome-title">Nzela</h1>
-            <p class="welcome-tagline">Le chemin vers la clarté</p>
-            <div class="welcome-input-container">
-                <textarea class="welcome-textarea" id="welcomeInput" placeholder="Décris-moi ton projet..." rows="1"></textarea>
-                <button class="welcome-send" id="welcomeSend">C'est parti</button>
-            </div>
-        </div>
-
-        <!-- Écran chat -->
-        <div class="chat-screen" id="chatScreen">
-            <div class="chat-header">
+        <!-- SIDEBAR (PC) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
                 <div class="logo"><span>N</span></div>
-                <div class="chat-header-info">
-                    <div class="chat-header-title">Nzela</div>
-                    <div class="chat-header-status">● En ligne</div>
+                <h1 class="sidebar-title">Nzela</h1>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Documents</div>
+                <div class="doc-list" id="docList">
+                    <div class="doc-item disabled" data-doc="charter_client">
+                        <span class="doc-item-icon">📄</span>
+                        <span class="doc-item-text">Project Charter Client</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="charter_ark">
+                        <span class="doc-item-icon">🔒</span>
+                        <span class="doc-item-text">Project Charter ARK</span>
+                        <span class="doc-item-badge">Interne</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="cahier_charge">
+                        <span class="doc-item-icon">📋</span>
+                        <span class="doc-item-text">Cahier de charge</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="budget">
+                        <span class="doc-item-icon">💰</span>
+                        <span class="doc-item-text">Budget prévisionnel</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="plan_projet">
+                        <span class="doc-item-icon">📅</span>
+                        <span class="doc-item-text">Plan de projet</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="risques">
+                        <span class="doc-item-icon">⚠️</span>
+                        <span class="doc-item-text">Matrice des risques</span>
+                    </div>
+                    <div class="doc-item disabled" data-doc="checklist">
+                        <span class="doc-item-icon">✅</span>
+                        <span class="doc-item-text">Checklist lancement</span>
+                    </div>
                 </div>
             </div>
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-                    <textarea class="chat-input" id="chatInput" placeholder="Écris ta réponse..." rows="1"></textarea>
-                    <button class="chat-send" id="chatSend">
-                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                    </button>
-                </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-new-project" onclick="newProject()">
+                    ✨ Nouveau projet
+                </button>
             </div>
-        </div>
+        </aside>
 
-        <!-- Écran loading -->
-        <div class="loading-screen" id="loadingScreen">
-            <div class="logo"><span>N</span></div>
-            <p class="loading-text" id="loadingText">Je prépare ton document...</p>
-        </div>
-
-        <!-- Écran document -->
-        <div class="document-screen" id="documentScreen">
-            <div class="document-header">
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- Header Mobile -->
+            <div class="mobile-header" id="mobileHeader">
                 <div class="logo"><span>N</span></div>
-                <div class="document-header-info">
-                    <div class="document-header-title">Ton document</div>
-                    <div class="document-header-badge" id="documentBadge">Cahier de charge</div>
+                <h1 class="mobile-header-title">Nzela</h1>
+                <button class="btn-docs-mobile" id="btnDocsMobile">📄</button>
+            </div>
+
+            <!-- Écran d'accueil -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="logo welcome-logo"><span>N</span></div>
+                <h1 class="welcome-title">Nzela</h1>
+                <p class="welcome-tagline">Le chemin vers la clarté</p>
+                <div class="welcome-input-container">
+                    <textarea class="welcome-textarea" id="welcomeInput" placeholder="Décris-moi ton projet..." rows="1"></textarea>
+                    <button class="welcome-send" id="welcomeSend">C'est parti</button>
                 </div>
             </div>
-            <div class="document-content">
-                <div class="document-body" id="documentBody"></div>
+
+            <!-- Écran chat -->
+            <div class="chat-screen" id="chatScreen">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea class="chat-input" id="chatInput" placeholder="Écris ta réponse..." rows="1"></textarea>
+                        <button class="chat-send" id="chatSend">
+                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="document-actions">
-                <div class="document-actions-inner">
-                    <div class="document-actions-row">
+
+            <!-- Écran loading -->
+            <div class="loading-screen" id="loadingScreen">
+                <div class="logo"><span>N</span></div>
+                <p class="loading-text" id="loadingText">Je prépare ton document...</p>
+            </div>
+
+            <!-- Écran document -->
+            <div class="document-screen" id="documentScreen">
+                <div class="document-header">
+                    <button class="btn-back" onclick="backToChat()">←</button>
+                    <div class="document-header-info">
+                        <div class="document-header-title">Document</div>
+                        <div class="document-header-badge" id="documentBadge">-</div>
+                    </div>
+                </div>
+                <div class="document-content">
+                    <div class="document-body" id="documentBody"></div>
+                </div>
+                <div class="document-actions">
+                    <div class="document-actions-inner">
                         <button class="btn-action btn-copy" onclick="copyDocument()">
                             📋 Copier
                         </button>
@@ -654,45 +959,20 @@
                             💬 WhatsApp
                         </button>
                     </div>
-                    <div class="document-actions-row">
-                        <button class="btn-action btn-other" onclick="showDocumentChoice()">
-                            📄 Autre document
-                        </button>
-                        <button class="btn-action btn-new" onclick="newProject()">
-                            ✨ Nouveau projet
-                        </button>
-                    </div>
                 </div>
             </div>
-        </div>
+        </main>
+    </div>
 
-        <!-- Modal choix document -->
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal">
-                <h3 class="modal-title">Quel document veux-tu ?</h3>
-                <div class="modal-options">
-                    <div class="modal-option" onclick="generateDocument('cahier_charge')">
-                        <span class="modal-option-icon">📋</span>
-                        <span class="modal-option-text">Cahier de charge</span>
-                    </div>
-                    <div class="modal-option" onclick="generateDocument('budget')">
-                        <span class="modal-option-icon">💰</span>
-                        <span class="modal-option-text">Budget prévisionnel</span>
-                    </div>
-                    <div class="modal-option" onclick="generateDocument('plan_projet')">
-                        <span class="modal-option-icon">📅</span>
-                        <span class="modal-option-text">Plan de projet</span>
-                    </div>
-                    <div class="modal-option" onclick="generateDocument('risques')">
-                        <span class="modal-option-icon">⚠️</span>
-                        <span class="modal-option-text">Matrice des risques</span>
-                    </div>
-                    <div class="modal-option" onclick="generateDocument('checklist')">
-                        <span class="modal-option-icon">✅</span>
-                        <span class="modal-option-text">Checklist de lancement</span>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="hideDocumentChoice()">Annuler</button>
+    <!-- MODAL DOCUMENTS (Mobile) -->
+    <div class="modal-overlay" id="modalDocs">
+        <div class="modal-docs">
+            <div class="modal-header">
+                <h3 class="modal-title">Documents disponibles</h3>
+                <button class="modal-close" onclick="closeDocsModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalDocsList">
+                <!-- Généré dynamiquement -->
             </div>
         </div>
     </div>
@@ -703,21 +983,32 @@
             whatsappNumber: '242064601399'
         };
 
-        const DOCUMENT_NAMES = {
-            'cahier_charge': 'Cahier de charge',
-            'budget': 'Budget prévisionnel',
-            'plan_projet': 'Plan de projet',
-            'risques': 'Matrice des risques',
-            'checklist': 'Checklist de lancement'
-        };
+        const DOCUMENTS = [
+            { id: 'charter_client', icon: '📄', name: 'Project Charter Client', desc: 'Document de cadrage client' },
+            { id: 'charter_ark', icon: '🔒', name: 'Project Charter ARK', desc: 'Version interne avec scoring', badge: 'Interne' },
+            { id: 'cahier_charge', icon: '📋', name: 'Cahier de charge', desc: 'Fonctionnalités détaillées' },
+            { id: 'budget', icon: '💰', name: 'Budget prévisionnel', desc: 'Investissements et charges' },
+            { id: 'plan_projet', icon: '📅', name: 'Plan de projet', desc: 'Phases et jalons' },
+            { id: 'risques', icon: '⚠️', name: 'Matrice des risques', desc: 'Risques identifiés' },
+            { id: 'checklist', icon: '✅', name: 'Checklist lancement', desc: 'Todo avant ouverture' }
+        ];
+
+        const DOCUMENT_NAMES = {};
+        DOCUMENTS.forEach(d => DOCUMENT_NAMES[d.id] = d.name);
 
         const state = {
             chatHistory: [],
             currentDocument: '',
-            currentDocType: ''
+            currentDocType: '',
+            generatedDocs: [],
+            conversationReady: false
         };
 
         const elements = {
+            sidebar: document.getElementById('sidebar'),
+            docList: document.getElementById('docList'),
+            mobileHeader: document.getElementById('mobileHeader'),
+            btnDocsMobile: document.getElementById('btnDocsMobile'),
             welcomeScreen: document.getElementById('welcomeScreen'),
             welcomeInput: document.getElementById('welcomeInput'),
             welcomeSend: document.getElementById('welcomeSend'),
@@ -730,11 +1021,13 @@
             documentScreen: document.getElementById('documentScreen'),
             documentBody: document.getElementById('documentBody'),
             documentBadge: document.getElementById('documentBadge'),
-            modalOverlay: document.getElementById('modalOverlay')
+            modalDocs: document.getElementById('modalDocs'),
+            modalDocsList: document.getElementById('modalDocsList')
         };
 
         // ===== INITIALISATION =====
         function init() {
+            // Welcome
             elements.welcomeInput.addEventListener('input', handleWelcomeInput);
             elements.welcomeInput.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -743,7 +1036,8 @@
                 }
             });
             elements.welcomeSend.addEventListener('click', handleWelcomeSend);
-            
+
+            // Chat
             elements.chatInput.addEventListener('input', handleChatInput);
             elements.chatInput.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -753,10 +1047,62 @@
             });
             elements.chatSend.addEventListener('click', handleChatSend);
 
-            // Fermer modal en cliquant dehors
-            elements.modalOverlay.addEventListener('click', e => {
-                if (e.target === elements.modalOverlay) hideDocumentChoice();
+            // Sidebar docs
+            elements.docList.querySelectorAll('.doc-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (!item.classList.contains('disabled')) {
+                        generateDocument(item.dataset.doc);
+                    }
+                });
             });
+
+            // Mobile docs button
+            elements.btnDocsMobile.addEventListener('click', openDocsModal);
+
+            // Modal close on overlay click
+            elements.modalDocs.addEventListener('click', e => {
+                if (e.target === elements.modalDocs) closeDocsModal();
+            });
+
+            // Render mobile modal docs
+            renderMobileDocsList();
+        }
+
+        function renderMobileDocsList() {
+            elements.modalDocsList.innerHTML = DOCUMENTS.map(doc => `
+                <div class="modal-doc-item ${state.conversationReady ? '' : 'disabled'}" data-doc="${doc.id}" onclick="handleMobileDocClick('${doc.id}')">
+                    <span class="modal-doc-icon">${doc.icon}</span>
+                    <div class="modal-doc-info">
+                        <div class="modal-doc-title">${doc.name}</div>
+                        <div class="modal-doc-desc">${doc.desc}</div>
+                    </div>
+                    <span class="modal-doc-status">${state.generatedDocs.includes(doc.id) ? '✓' : ''}</span>
+                </div>
+            `).join('');
+        }
+
+        function handleMobileDocClick(docId) {
+            if (!state.conversationReady) return;
+            closeDocsModal();
+            generateDocument(docId);
+        }
+
+        function updateDocsList() {
+            // Update sidebar
+            elements.docList.querySelectorAll('.doc-item').forEach(item => {
+                const docId = item.dataset.doc;
+                if (state.conversationReady) {
+                    item.classList.remove('disabled');
+                }
+                if (state.generatedDocs.includes(docId)) {
+                    if (!item.querySelector('.doc-item-check')) {
+                        item.insertAdjacentHTML('beforeend', '<span class="doc-item-check">✓</span>');
+                    }
+                }
+            });
+
+            // Update mobile modal
+            renderMobileDocsList();
         }
 
         // ===== WELCOME =====
@@ -769,7 +1115,7 @@
         function handleWelcomeSend() {
             const message = elements.welcomeInput.value.trim();
             if (!message) return;
-            
+
             switchScreen('chat');
             addMessage('user', message);
             sendToAPI(message);
@@ -785,11 +1131,11 @@
         function handleChatSend() {
             const message = elements.chatInput.value.trim();
             if (!message) return;
-            
+
             elements.chatInput.value = '';
             elements.chatInput.style.height = 'auto';
             elements.chatSend.classList.remove('active');
-            
+
             addMessage('user', message);
             sendToAPI(message);
         }
@@ -800,7 +1146,7 @@
             messageDiv.innerHTML = `<div class="message-bubble">${escapeHtml(content)}</div>`;
             elements.chatMessages.appendChild(messageDiv);
             scrollToBottom();
-            
+
             state.chatHistory.push({ type, content });
         }
 
@@ -833,7 +1179,7 @@
         // ===== API =====
         async function sendToAPI(message) {
             showTyping();
-            
+
             try {
                 const response = await fetch(CONFIG.apiUrl, {
                     method: 'POST',
@@ -844,32 +1190,29 @@
                         history: state.chatHistory
                     })
                 });
-                
+
                 const data = await response.json();
                 hideTyping();
-                
+
                 if (data.action === 'generate') {
                     addMessage('ai', data.response);
-                    
-                    setTimeout(() => {
-                        generateDocument('cahier_charge');
-                    }, 1500);
+                    state.conversationReady = true;
+                    updateDocsList();
                 } else {
                     addMessage('ai', data.response);
                 }
-                
+
             } catch (error) {
                 hideTyping();
                 console.error('Erreur:', error);
-                addMessage('ai', 'Oups, une erreur est survenue. Réessaie !');
+                addMessage('ai', 'Une erreur est survenue. Réessaie !');
             }
         }
 
         async function generateDocument(docType) {
-            hideDocumentChoice();
             elements.loadingText.textContent = `Je prépare ton ${DOCUMENT_NAMES[docType].toLowerCase()}...`;
             switchScreen('loading');
-            
+
             try {
                 const response = await fetch(CONFIG.apiUrl, {
                     method: 'POST',
@@ -880,20 +1223,24 @@
                         history: state.chatHistory
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success && data.document) {
                     state.currentDocument = data.document;
                     state.currentDocType = docType;
+                    if (!state.generatedDocs.includes(docType)) {
+                        state.generatedDocs.push(docType);
+                    }
                     elements.documentBadge.textContent = DOCUMENT_NAMES[docType];
                     renderDocument(data.document);
+                    updateDocsList();
                     switchScreen('document');
                 } else {
                     alert('Erreur lors de la génération. Réessaie !');
                     switchScreen('chat');
                 }
-                
+
             } catch (error) {
                 console.error('Erreur:', error);
                 alert('Erreur de connexion. Réessaie !');
@@ -910,23 +1257,20 @@
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/^\- (.*$)/gm, '• $1')
                 .replace(/\n/g, '<br>');
-            
+
             elements.documentBody.innerHTML = html;
         }
 
         // ===== FORMAT WHATSAPP =====
         function formatForWhatsApp(text) {
             return text
-                // Titres
                 .replace(/^# (.*$)/gm, '📋 *$1*')
                 .replace(/^## (.*$)/gm, '$1')
                 .replace(/^### \d+\. (.*$)/gm, '\n📌 *$1*')
                 .replace(/^### (.*$)/gm, '\n📌 *$1*')
                 .replace(/^#### (.*$)/gm, '*$1*')
-                // Nettoyage
                 .replace(/---/g, '')
                 .replace(/\*\*(.*?)\*\*/g, '*$1*')
-                // Supprimer lignes vides multiples
                 .replace(/\n{3,}/g, '\n\n')
                 .trim();
         }
@@ -944,20 +1288,35 @@
             window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${text}`, '_blank');
         }
 
-        function showDocumentChoice() {
-            elements.modalOverlay.classList.add('visible');
+        function backToChat() {
+            switchScreen('chat');
         }
 
-        function hideDocumentChoice() {
-            elements.modalOverlay.classList.remove('visible');
+        function openDocsModal() {
+            elements.modalDocs.classList.add('visible');
+        }
+
+        function closeDocsModal() {
+            elements.modalDocs.classList.remove('visible');
         }
 
         function newProject() {
             state.chatHistory = [];
             state.currentDocument = '';
             state.currentDocType = '';
+            state.generatedDocs = [];
+            state.conversationReady = false;
             elements.chatMessages.innerHTML = '';
             elements.welcomeInput.value = '';
+
+            // Reset sidebar
+            elements.docList.querySelectorAll('.doc-item').forEach(item => {
+                item.classList.add('disabled');
+                const check = item.querySelector('.doc-item-check');
+                if (check) check.remove();
+            });
+
+            renderMobileDocsList();
             switchScreen('welcome');
         }
 
@@ -967,7 +1326,7 @@
             elements.chatScreen.classList.remove('visible');
             elements.loadingScreen.classList.remove('visible');
             elements.documentScreen.classList.remove('visible');
-            
+
             if (screen === 'welcome') elements.welcomeScreen.classList.remove('hidden');
             else if (screen === 'chat') elements.chatScreen.classList.add('visible');
             else if (screen === 'loading') elements.loadingScreen.classList.add('visible');
